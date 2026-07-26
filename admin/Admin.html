@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผังสแตนเชียร์ - ผู้ดูแลระบบ (Admin)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --y1:#FFD700; --y2:#FFA500; --warm:#FFFEF5;
+            --dk:#3D2B00; --mid:#7A5500; --soft:#A07820;
+            --bdr:rgba(255,210,60,.45); --shw:rgba(255,200,0,.2); --shb:rgba(60,40,0,.07);
+        }
+        *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+        body {
+            font-family:'Prompt','Sarabun',sans-serif;
+            background:linear-gradient(155deg,#FFFDE7 0%,#FFF3CD 50%,#FFE09A 100%);
+            min-height:100vh; padding:24px 16px 64px;
+            display:flex; flex-direction:column; align-items:center;
+            -webkit-font-smoothing:antialiased;
+        }
+        /* bg blobs */
+        .blob { position:fixed; border-radius:50%; pointer-events:none; z-index:0; }
+        .blob-1 { width:420px;height:420px; background:radial-gradient(circle,rgba(255,215,0,.14) 0%,transparent 68%); top:-120px;right:-120px; animation:blobFloat 9s ease-in-out infinite; }
+        .blob-2 { width:300px;height:300px; background:radial-gradient(circle,rgba(255,160,0,.1) 0%,transparent 68%); bottom:-80px;left:-80px; animation:blobFloat 11s ease-in-out infinite reverse; }
+        @keyframes blobFloat { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(16px,-18px) scale(1.05)} }
+        .app-container { width:100%; max-width:1240px; display:flex; flex-direction:column; gap:20px; position:relative; z-index:1; }
+        /* ── Auth overlay ── */
+        .auth-overlay {
+            position:fixed; inset:0; background:rgba(60,40,0,.62);
+            backdrop-filter:blur(8px);
+            display:flex; justify-content:center; align-items:center; z-index:2000;
+        }
+        .auth-card {
+            background:var(--warm); border-radius:32px; padding:40px 36px;
+            width:90%; max-width:400px;
+            box-shadow:0 28px 70px rgba(60,40,0,.22);
+            text-align:center; border:2px solid var(--bdr);
+            animation:modalPop .3s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes modalPop { from{transform:scale(.85) translateY(24px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+        /* animated lock icon */
+        .auth-lock {
+            width:64px; height:64px; margin:0 auto 16px;
+            background:linear-gradient(135deg,#FFD700,#FFC200);
+            border-radius:20px; display:flex; align-items:center; justify-content:center;
+            box-shadow:0 8px 24px rgba(255,165,0,.4);
+            animation:lockBounce 2.5s ease-in-out infinite;
+        }
+        .auth-lock svg { width:30px; height:30px; color:var(--dk); }
+        @keyframes lockBounce { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-8px) rotate(4deg)} }
+        .auth-card h2 { font-size:1.5rem; font-weight:800; color:var(--dk); margin-bottom:6px; }
+        .auth-card p  { font-size:.88rem; color:var(--soft); margin-bottom:22px; line-height:1.5; }
+        .auth-card input {
+            width:100%; padding:12px 16px; border:2px solid var(--bdr); border-radius:16px;
+            font-size:1rem; margin-bottom:14px; outline:none; text-align:center;
+            font-family:'Prompt',sans-serif; background:rgba(255,248,200,.5); color:var(--dk);
+            transition:border-color .15s,box-shadow .15s;
+        }
+        .auth-card input:focus { border-color:var(--y2); background:#FFFEF5; box-shadow:0 0 0 4px rgba(255,165,0,.15); }
+        #authErrMsg {
+            color:#C62828; font-size:.84rem; margin-bottom:12px; display:none;
+            background:#FFEBEE; padding:8px 12px; border-radius:10px; border:1px solid #FFCDD2;
+            display:none; align-items:center; gap:7px;
+        }
+        #authErrMsg svg { width:15px; height:15px; flex-shrink:0; }
+        .btn-auth {
+            width:100%; padding:13px; background:linear-gradient(135deg,#FFD700,#FFA500);
+            color:var(--dk); border:none; border-radius:16px; font-size:1rem; font-weight:800;
+            cursor:pointer; font-family:'Prompt',sans-serif;
+            box-shadow:0 6px 20px rgba(255,165,0,.4); display:flex; align-items:center;
+            justify-content:center; gap:8px;
+            transition:all .2s cubic-bezier(.34,1.56,.64,1);
+        }
+        .btn-auth svg { width:18px; height:18px; }
+        .btn-auth:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(255,165,0,.5); }
+        .auth-back { margin-top:16px; }
+        .auth-back a { color:var(--soft); font-size:.86rem; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:color .15s; }
+        .auth-back a svg { width:14px; height:14px; }
+        .auth-back a:hover { color:var(--dk); }
+
+        /* ── Admin header ── */
+        .admin-header {
+            background:linear-gradient(135deg,#3D2B00 0%,#6B4A00 60%,#8B6200 100%);
+            color:#fff; padding:22px 28px; border-radius:28px;
+            display:flex; align-items:center; justify-content:space-between;
+            gap:16px; flex-wrap:wrap;
+            box-shadow:0 8px 32px rgba(60,40,0,.28);
+            border:2px solid rgba(255,215,0,.2);
+            position:relative; overflow:hidden;
+        }
+        /* watermark sun in header */
+        .admin-header::after {
+            content:''; position:absolute; right:28px; top:50%; transform:translateY(-50%);
+            width:90px; height:90px;
+            background:url("data:image/svg+xml,%3Csvg viewBox='0 0 80 80' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='18' fill='%23FFD700'/%3E%3Cg stroke='%23FFA500' stroke-width='3.5' stroke-linecap='round'%3E%3Cline x1='40' y1='6' x2='40' y2='15'/%3E%3Cline x1='40' y1='65' x2='40' y2='74'/%3E%3Cline x1='6' y1='40' x2='15' y2='40'/%3E%3Cline x1='65' y1='40' x2='74' y2='40'/%3E%3Cline x1='14.4' y1='14.4' x2='20.7' y2='20.7'/%3E%3Cline x1='59.3' y1='59.3' x2='65.6' y2='65.6'/%3E%3Cline x1='65.6' y1='14.4' x2='59.3' y2='20.7'/%3E%3Cline x1='20.7' y1='59.3' x2='14.4' y2='65.6'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+            opacity:.1; pointer-events:none;
+        }
+        .admin-title-group { display:flex; flex-direction:column; gap:4px; }
+        .admin-title-group h1 { font-size:1.6rem; font-weight:800; color:#FFD700; display:flex; align-items:center; gap:10px; }
+        .admin-title-group h1 svg { width:24px; height:24px; flex-shrink:0; }
+        .admin-title-group p { font-size:.85rem; color:#D4BB88; }
+        .header-actions { display:flex; gap:10px; }
+        .btn-nav {
+            padding:9px 18px; border-radius:12px; font-size:.88rem; font-weight:700;
+            text-decoration:none; cursor:pointer; border:none;
+            display:inline-flex; align-items:center; gap:7px;
+            font-family:'Prompt',sans-serif;
+            transition:all .2s cubic-bezier(.34,1.56,.64,1);
+        }
+        .btn-nav svg { width:15px; height:15px; flex-shrink:0; }
+        .btn-home { background:rgba(255,255,255,.15); color:#FFE082; border:1.5px solid rgba(255,215,0,.3); }
+        .btn-home:hover { background:rgba(255,215,0,.25); color:#FFD700; transform:translateY(-2px); }
+        .btn-logout { background:linear-gradient(135deg,#E53935,#C62828); color:#fff; box-shadow:0 4px 12px rgba(198,40,40,.4); }
+        .btn-logout:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(198,40,40,.5); }
+        /* ── stat cards ── */
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+        .stat-card {
+            background:var(--warm); border:2px solid var(--bdr); border-radius:24px;
+            padding:20px 22px; display:flex; flex-direction:column; gap:6px;
+            box-shadow:0 4px 18px var(--shb),0 2px 6px var(--shw);
+            transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+            position:relative; overflow:hidden;
+        }
+        .stat-card:hover { transform:translateY(-4px); box-shadow:0 10px 28px var(--shb); }
+        /* decorative circle watermark */
+        .stat-card::after {
+            content:''; position:absolute; bottom:-18px; right:-18px;
+            width:72px; height:72px; border-radius:50%;
+            border:3px solid rgba(255,210,60,.2); pointer-events:none;
+        }
+        .stat-card .label {
+            font-size:.83rem; color:var(--soft); font-weight:600;
+            display:flex; align-items:center; gap:7px;
+        }
+        .stat-card .label svg { width:15px; height:15px; flex-shrink:0; }
+        .stat-card .value { font-size:2rem; font-weight:800; color:var(--y2); line-height:1.1; }
+        .dot { width:9px; height:9px; border-radius:50%; display:inline-block; flex-shrink:0; }
+        .dot-red { background:#C62828; } .dot-green { background:#2E7D32; }
+
+        /* ── toolbar ── */
+        .toolbar-card {
+            background:var(--warm); border:2px solid var(--bdr); border-radius:24px;
+            padding:16px 22px; display:flex; flex-wrap:wrap; align-items:center;
+            justify-content:space-between; gap:16px;
+            box-shadow:0 4px 18px var(--shb);
+        }
+        .search-box { position:relative; flex:1; min-width:260px; max-width:420px; }
+        .search-box input {
+            width:100%; padding:10px 13px 10px 38px; border:2px solid var(--bdr); border-radius:14px;
+            font-size:.9rem; outline:none; font-family:'Prompt',sans-serif;
+            background:rgba(255,248,200,.5); color:var(--dk);
+            transition:border-color .15s,box-shadow .15s;
+        }
+        .search-box input:focus { border-color:var(--y2); background:#FFFEF5; box-shadow:0 0 0 4px rgba(255,165,0,.15); }
+        .search-box .icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--soft); display:flex; }
+        .search-box .icon svg { width:15px; height:15px; }
+        .action-btns { display:flex; gap:10px; flex-wrap:wrap; }
+        .btn-action {
+            padding:10px 18px; border-radius:14px; font-size:.88rem; font-weight:700;
+            border:none; cursor:pointer; font-family:'Prompt',sans-serif;
+            display:inline-flex; align-items:center; gap:7px;
+            transition:all .2s cubic-bezier(.34,1.56,.64,1);
+        }
+        .btn-action svg { width:15px; height:15px; flex-shrink:0; }
+        .btn-export { background:linear-gradient(135deg,#2E7D32,#1B5E20); color:#fff; box-shadow:0 4px 14px rgba(46,125,50,.35); }
+        .btn-export:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(46,125,50,.45); }
+        .btn-reset-all { background:#FFF0F0; color:#C62828; border:2px solid #FFCDD2; }
+        .btn-reset-all:hover { background:#FFEBEE; transform:translateY(-2px); }
+
+        /* ── table ── */
+        .table-card {
+            background:var(--warm); border:2px solid var(--bdr); border-radius:24px;
+            padding:22px; box-shadow:0 4px 20px var(--shb); overflow-x:auto;
+        }
+        table { width:100%; border-collapse:collapse; font-size:.88rem; min-width:920px; }
+        th {
+            background:linear-gradient(135deg,#FFF8CC,#FFE566); color:var(--mid);
+            font-weight:700; text-align:left; padding:13px 16px;
+            border-bottom:2px solid rgba(255,200,50,.4); white-space:nowrap; font-size:.84rem;
+        }
+        th:first-child { border-radius:12px 0 0 0; } th:last-child { border-radius:0 12px 0 0; }
+        td { padding:12px 16px; border-bottom:1px solid rgba(255,210,60,.2); color:var(--dk); vertical-align:middle; }
+        tr:last-child td { border-bottom:none; }
+        tr:hover td { background:rgba(255,245,150,.22); }
+        .badge-seat {
+            display:inline-block; background:linear-gradient(135deg,#FFD700,#FFC200);
+            color:var(--dk); padding:3px 10px; border-radius:8px;
+            font-weight:800; font-size:.88rem; box-shadow:0 2px 6px rgba(255,165,0,.3);
+        }
+        .badge-code {
+            font-family:monospace; background:rgba(255,240,150,.4);
+            padding:3px 8px; border-radius:7px; font-size:.85rem;
+            color:var(--mid); border:1px solid var(--bdr);
+        }
+        .btn-tbl-del {
+            background:#FFF0F0; color:#C62828; border:1.5px solid #FFCDD2;
+            padding:6px 12px; border-radius:10px; font-size:.8rem; font-weight:700;
+            cursor:pointer; font-family:'Prompt',sans-serif;
+            display:inline-flex; align-items:center; gap:5px;
+            transition:all .18s ease;
+        }
+        .btn-tbl-del svg { width:13px; height:13px; flex-shrink:0; }
+        .btn-tbl-del:hover { background:linear-gradient(135deg,#E53935,#C62828); color:#fff; border-color:transparent; transform:scale(1.05); }
+        .empty-state { text-align:center; padding:48px 24px; color:var(--soft); }
+        .empty-state .empty-icon { width:56px; height:56px; margin:0 auto 14px; opacity:.35; }
+        .empty-state .empty-icon svg { width:56px; height:56px; }
+
+        /* ── toast ── */
+        .toast-container { position:fixed; bottom:24px; right:24px; z-index:3000; display:flex; flex-direction:column; gap:8px; }
+        .toast {
+            background:var(--warm); border:2px solid var(--bdr); border-left:5px solid var(--y1);
+            color:var(--dk); padding:11px 18px; border-radius:16px;
+            box-shadow:0 6px 20px var(--shb); font-size:.87rem; font-weight:500;
+            display:flex; align-items:center; gap:10px;
+            animation:toastIn .25s cubic-bezier(.34,1.56,.64,1);
+        }
+        .toast svg { width:16px; height:16px; flex-shrink:0; color:var(--y2); }
+        .toast.error { border-left-color:#E53935; }
+        .toast.error svg { color:#E53935; }
+        @keyframes toastIn { from{transform:translateX(40px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+        /* ── lyrics fab ── */
+        .lyrics-fab {
+            position:fixed; bottom:28px; right:28px; width:54px; height:54px;
+            border-radius:50%; background:linear-gradient(135deg,#FFD700,#FFA500);
+            color:var(--dk); border:none; cursor:pointer;
+            box-shadow:0 6px 20px rgba(255,165,0,.5); z-index:999;
+            display:flex; align-items:center; justify-content:center;
+            transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+        }
+        .lyrics-fab svg { width:22px; height:22px; }
+        .lyrics-fab:hover { transform:scale(1.15) rotate(10deg); box-shadow:0 10px 28px rgba(255,165,0,.6); }
+        .lyrics-overlay { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; justify-content:center; align-items:center; z-index:2000; opacity:0; transition:opacity .2s ease; padding:16px; }
+        .lyrics-overlay.active { opacity:1; }
+        .lyrics-card { background:var(--warm-white); border-radius:24px; padding:20px; width:100%; max-width:520px; box-shadow:0 28px 70px rgba(0,0,0,.45); border:2px solid var(--border); display:flex; flex-direction:column; gap:14px; animation:modalPop .28s cubic-bezier(.34,1.56,.64,1); }
+        .lyrics-card-header { display:flex; align-items:center; justify-content:space-between; }
+        .lyrics-card-title { font-size:1rem; font-weight:800; color:var(--dk); display:flex; align-items:center; gap:8px; }
+        .lyrics-card-title svg { width:18px; height:18px; color:var(--gold); }
+        .lyrics-close { width:32px; height:32px; background:#F0EDE6; border:none; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#888; flex-shrink:0; transition:all .15s ease; }
+        .lyrics-close:hover { background:#FFD700; color:var(--dk); transform:rotate(90deg); }
+        .lyrics-tabs { display:flex; gap:8px; }
+        .lyrics-tab-btn { flex:1; padding:9px 12px; border:2px solid var(--border); border-radius:12px; background:rgba(255,248,200,.4); font-size:.88rem; font-weight:700; color:var(--mid); cursor:pointer; font-family:'Prompt',sans-serif; transition:all .18s ease; display:flex; align-items:center; justify-content:center; gap:7px; }
+        .lyrics-tab-btn svg { width:15px; height:15px; }
+        .lyrics-tab-btn.active { background:linear-gradient(135deg,#FFD700,#FFA500); color:var(--dk); border-color:var(--gold); box-shadow:0 4px 14px rgba(255,165,0,.3); }
+        .lyrics-tab-btn:not(.active):hover { background:rgba(255,215,0,.25); border-color:var(--gold); }
+        .lyrics-img-wrap img { width:100%; max-height:65vh; border-radius:14px; display:block; object-fit:contain; box-shadow:0 8px 28px rgba(0,0,0,.18); }
+        .lyrics-download-btn { width:100%; padding:11px 16px; border:none; border-radius:14px; background:linear-gradient(135deg,#3D2B00,#6B4A00); color:#FFD700; font-size:.92rem; font-weight:700; cursor:pointer; font-family:'Prompt',sans-serif; display:flex; align-items:center; justify-content:center; gap:9px; transition:all .2s cubic-bezier(.34,1.56,.64,1); box-shadow:0 4px 14px rgba(60,40,0,.25); }
+        .lyrics-download-btn svg { width:16px; height:16px; }
+        .lyrics-download-btn:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(60,40,0,.35); }
+    </style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<!-- Auth Overlay -->
+<div class="auth-overlay" id="authOverlay">
+    <div class="auth-card">
+        <div class="auth-lock">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h2>ผู้ดูแลระบบ (Admin)</h2>
+        <p>กรุณากรอกรหัสผ่านเพื่อเข้าสู่แดชบอร์ด<br>คณะสีเหลือง เทพอพอลโล</p>
+        <input type="password" id="passAuthInput" placeholder="รหัสผ่าน Admin..." onkeydown="if(event.key==='Enter') verifyAdminAuth()"/>
+        <div id="authErrMsg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่
+        </div>
+        <button class="btn-auth" onclick="verifyAdminAuth()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            เข้าสู่ระบบ
+        </button>
+        <div class="auth-back">
+            <a href="../index.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                กลับสู่หน้าหลัก
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main App -->
+<div class="app-container" id="adminMainApp" style="display:none;">
+
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="admin-title-group">
+            <h1>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Admin Dashboard
+            </h1>
+            <p>ผังสแตนเชียร์ คณะสีเหลือง เทพอพอลโล &nbsp;•&nbsp; บริหารจัดการข้อมูลการจองที่นั่ง</p>
+        </div>
+        <div class="header-actions">
+            <a href="../index.html" class="btn-nav btn-home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                หน้าหลัก
+            </a>
+            <button onclick="logoutAdmin()" class="btn-nav btn-logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                ออกจากระบบ
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                ที่นั่งทั้งหมด
+            </span>
+            <span class="value" id="admTotal">180</span>
+        </div>
+        <div class="stat-card">
+            <span class="label"><span class="dot dot-red"></span> จองแล้ว</span>
+            <span class="value" id="admBooked" style="color:#C62828;">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="label"><span class="dot dot-green"></span> ที่นั่งว่าง</span>
+            <span class="value" id="admAvailable" style="color:#2E7D32;">180</span>
+        </div>
+        <div class="stat-card">
+            <span class="label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                อัตราการจอง
+            </span>
+            <span class="value" id="admRate">0%</span>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar-card">
+        <div class="search-box">
+            <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" id="admSearchInput" placeholder="ค้นหาตามชื่อ, ชั้น, เลขที่, รหัส..." oninput="renderAdminTable()"/>
+        </div>
+        <div class="action-btns">
+            <button class="btn-action btn-export" onclick="exportToCSV()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV (Excel)
+            </button>
+            <button class="btn-action btn-reset-all" onclick="confirmResetAll()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                ล้างการจองทั้งหมด
+            </button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>รหัสที่นั่ง</th><th>ชื่อ-นามสกุล</th><th>ชั้นเรียน</th>
+                    <th>เลขที่</th><th>รหัสประจำตัว (7 หลัก)</th>
+                    <th>รหัสยกเลิก (8 หลัก)</th><th>เวลาที่จอง</th><th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="admTableBody"></tbody>
+        </table>
+    </div>
+
+</div><!-- end adminMainApp -->
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Lyrics FAB -->
+<button class="lyrics-fab" onclick="openLyrics()" title="เนื้อเพลง">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+</button>
+
+<!-- Lyrics Modal -->
+<div class="lyrics-overlay" id="lyricsOverlay" onclick="closeLyrics(event)">
+    <div class="lyrics-card" onclick="event.stopPropagation()">
+        <div class="lyrics-card-header">
+            <div class="lyrics-card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                เนื้อเพลง
+            </div>
+            <button class="lyrics-close" onclick="closeLyricsBtn()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="lyrics-tabs">
+            <button class="lyrics-tab-btn active" id="tabMorning" onclick="switchLyricsTab('morning')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                ช่วงเช้า
+            </button>
+            <button class="lyrics-tab-btn" id="tabEvening" onclick="switchLyricsTab('evening')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                ช่วงเย็น
+            </button>
+        </div>
+        <div class="lyrics-img-wrap">
+            <img id="lyricsImg" src="../morning.jpg" alt="เนื้อเพลงช่วงเช้า" />
+        </div>
+        <button class="lyrics-download-btn" onclick="downloadLyrics()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            ดาวน์โหลดรูปเนื้อเพลง
+        </button>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbtyqRo3A3orWFyCqtGv1yESs3Qtfkjn7D9vIHsCUeFtArPXXnZJ2B7XLRjI0csuKf/exec";
+    const STORAGE_KEY = "apollo_stand_bookings_v2";
+    const ADMIN_PASS  = "yellowisusmah";
+    let bookedData = {};
+
+    const ICON_OK  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    const ICON_ERR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+
+    function checkAuth(){
+        const ok=sessionStorage.getItem('apollo_admin_auth')==='true';
+        document.getElementById('authOverlay').style.display   = ok?'none':'flex';
+        document.getElementById('adminMainApp').style.display  = ok?'flex':'none';
+        if(ok) fetchAdminData();
+        else setTimeout(()=>document.getElementById('passAuthInput').focus(),100);
+    }
+    function verifyAdminAuth(){
+        const val=document.getElementById('passAuthInput').value.trim();
+        if(val===ADMIN_PASS){ sessionStorage.setItem('apollo_admin_auth','true'); checkAuth(); }
+        else {
+            const el=document.getElementById('authErrMsg');
+            el.style.display='flex';
+        }
+    }
+    function logoutAdmin(){ sessionStorage.removeItem('apollo_admin_auth'); checkAuth(); }
+
+    function showToast(message,isError=false){
+        const c=document.getElementById('toastContainer');
+        const t=document.createElement('div'); t.className=`toast ${isError?'error':''}`;
+        t.innerHTML=(isError?ICON_ERR:ICON_OK)+`<span>${message}</span>`;
+        c.appendChild(t);
+        setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(40px)';t.style.transition='all .2s ease';setTimeout(()=>t.remove(),200);},3000);
+    }
+
+    function loadLocalData(){ try{const s=localStorage.getItem(STORAGE_KEY);if(s)bookedData=JSON.parse(s);}catch(e){} }
+    function saveLocalData(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(bookedData)); }
+
+    function fetchAdminData(){
+        loadLocalData(); renderAdminTable();
+        fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'get'})})
+        .then(r=>r.json())
+        .then(data=>{ if(data&&typeof data==='object'){bookedData={...bookedData,...data};saveLocalData();renderAdminTable();} })
+        .catch(err=>{ console.error(err); });
+    }
+
+    function isDateString(val){
+        if(typeof val!=='string') return false;
+        const s=val.trim(); if(!s) return false;
+        if(/^\d{4}-\d{2}-\d{2}/.test(s)) return true;
+        if(/(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i.test(s)) return true;
+        if(/GMT[+-]\d{4}/i.test(s)||/เวลาอินโดจีน/i.test(s)||/Indochina Time/i.test(s)) return true;
+        return false;
+    }
+
+    function renderAdminTable(){
+        const tbody=document.getElementById('admTableBody'); tbody.innerHTML='';
+        const searchTerm=(document.getElementById('admSearchInput')?.value||'').trim().toLowerCase();
+        let bookedCount=0; const entries=[];
+
+        for(const seatId in bookedData){
+            const info=bookedData[seatId]; if(!info) continue;
+            let name='',className='',num='',pass='',cancelpass='',time='';
+            if(typeof info==='string'&&info.trim()!==''){
+                if(isDateString(info)){name='-';time=info;}else name=info;
+            } else if(typeof info==='object'){
+                const rawName=(info.name||'').trim();
+                if(isDateString(rawName)){name='-';time=info.time||rawName;}
+                else{name=rawName;time=info.time||'';}
+                className=info.class||''; num=info.num||''; pass=info.pass||''; cancelpass=info.cancelpass||'';
+            }
+            if(!name&&!className&&!num&&!pass&&!cancelpass&&!time) continue;
+            bookedCount++;
+            if(searchTerm){
+                const match=[seatId,name,className,num,pass,cancelpass].some(v=>v.toLowerCase().includes(searchTerm));
+                if(!match) continue;
+            }
+            entries.push({seatId,name,className,num,pass,cancelpass,time});
+        }
+        entries.sort((a,b)=>a.seatId.localeCompare(b.seatId));
+
+        if(entries.length===0){
+            tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>ไม่พบข้อมูลการจองที่นั่ง</div></td></tr>`;
+        } else {
+            entries.forEach(item=>{
+                const tr=document.createElement('tr');
+                const timeStr=item.time?(()=>{try{return new Date(item.time).toLocaleString('th-TH');}catch(e){return item.time;}})():'-';
+                tr.innerHTML=`
+                    <td><span class="badge-seat">${item.seatId}</span></td>
+                    <td><strong>${item.name||'-'}</strong></td>
+                    <td>${item.className||'-'}</td>
+                    <td>${item.num||'-'}</td>
+                    <td><span class="badge-code">${item.pass||'-'}</span></td>
+                    <td><span class="badge-code" style="color:var(--mid);">${item.cancelpass||'-'}</span></td>
+                    <td style="font-size:.8rem;color:var(--soft);">${timeStr}</td>
+                    <td>
+                        <button class="btn-tbl-del" onclick="deleteSeatByAdmin('${item.seatId}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            ปลดล็อกที่
+                        </button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+        document.getElementById('admTotal').innerText    = 180;
+        document.getElementById('admBooked').innerText   = bookedCount;
+        document.getElementById('admAvailable').innerText= 180-bookedCount;
+        document.getElementById('admRate').innerText     = `${((bookedCount/180)*100).toFixed(1)}%`;
+    }
+
+    function deleteSeatByAdmin(seatId){
+        if(!confirm(`ต้องการปลดล็อกที่นั่ง ${seatId} ใช่หรือไม่?`)) return;
+        delete bookedData[seatId]; saveLocalData(); renderAdminTable();
+        showToast(`ปลดล็อกที่นั่ง ${seatId} สำเร็จ`);
+        fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'admin_clear',adminPass:ADMIN_PASS,seatId})}).catch(e=>console.error(e));
+    }
+    function confirmResetAll(){
+        if(!confirm('คำเตือน: ต้องการล้างข้อมูลการจองทั้งหมดใช่หรือไม่?\nข้อมูลจะถูกลบและไม่สามารถกู้คืนได้!')) return;
+        bookedData={}; saveLocalData(); renderAdminTable();
+        showToast('ล้างข้อมูลการจองทั้งหมดเรียบร้อยแล้ว');
+        fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'admin_clear_all',adminPass:ADMIN_PASS})}).catch(e=>console.error(e));
+    }
+    function exportToCSV(){
+        let csv='\uFEFF';
+        csv+='รหัสที่นั่ง,ชื่อ-นามสกุล,ชั้นเรียน,เลขที่,รหัส7หลัก,รหัสยกเลิก8หลัก,เวลาที่จอง\n';
+        for(const seatId in bookedData){
+            const info=bookedData[seatId]; if(!info) continue;
+            let name='',className='',num='',pass='',cancelpass='',time='';
+            if(typeof info==='string') name=info;
+            else if(typeof info==='object'){name=info.name||'';className=info.class||'';num=info.num||'';pass=info.pass||'';cancelpass=info.cancelpass||'';time=info.time||'';}
+            if(!name) continue;
+            csv+=`"${seatId}","${name}","${className}","${num}","${pass}","${cancelpass}","${time}"\n`;
+        }
+        const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+        const link=document.createElement('a');
+        link.href=URL.createObjectURL(blob);
+        link.download=`ผังสแตนเชียร์_เทพอพอลโล_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        showToast('ส่งออกไฟล์ CSV เรียบร้อยแล้ว!');
+    }
+
+    function openLyrics(){const o=document.getElementById('lyricsOverlay');o.style.display='flex';setTimeout(()=>o.classList.add('active'),10);}
+    function closeLyricsBtn(){const o=document.getElementById('lyricsOverlay');o.classList.remove('active');setTimeout(()=>{o.style.display='none';},200);}
+    function closeLyrics(e){if(e.target===document.getElementById('lyricsOverlay'))closeLyricsBtn();}
+
+    window.onload=checkAuth;
+</script>
+</body>
+</html>

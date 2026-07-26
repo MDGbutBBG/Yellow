@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผังสแตนเชียร์ - คณะสีเหลือง เทพอพอลโล</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --y1: #FFD700;
+            --y2: #FFA500;
+            --y3: #FFF9E0;
+            --y4: #FFFDE7;
+            --warm: #FFFEF5;
+            --dk: #3D2B00;
+            --mid: #7A5500;
+            --soft: #A07820;
+            --bdr: rgba(255,210,60,0.45);
+            --shw: rgba(255,200,0,0.2);
+            --shb: rgba(60,40,0,0.07);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Prompt','Sarabun',sans-serif;
+            background: linear-gradient(155deg, #FFFDE7 0%, #FFF3CD 50%, #FFE09A 100%);
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 40px 16px;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ── decorative blobs ── */
+        .blob {
+            position: fixed; border-radius: 50%;
+            pointer-events: none; z-index: 0;
+        }
+        .blob-1 {
+            width: 480px; height: 480px;
+            background: radial-gradient(circle, rgba(255,215,0,.18) 0%, transparent 68%);
+            top: -140px; right: -140px;
+            animation: blobFloat 9s ease-in-out infinite;
+        }
+        .blob-2 {
+            width: 360px; height: 360px;
+            background: radial-gradient(circle, rgba(255,160,0,.13) 0%, transparent 68%);
+            bottom: -100px; left: -100px;
+            animation: blobFloat 11s ease-in-out infinite reverse;
+        }
+        .blob-3 {
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(255,230,80,.15) 0%, transparent 68%);
+            top: 38%; left: -60px;
+            animation: blobFloat 7s ease-in-out infinite 2s;
+        }
+        @keyframes blobFloat {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50%      { transform: translate(18px,-22px) scale(1.06); }
+        }
+
+        /* ── CSS star decorations ── */
+        .star {
+            position: fixed; pointer-events: none; z-index: 0;
+            animation: starTwinkle 3s ease-in-out infinite;
+        }
+        .star::before, .star::after {
+            content: '';
+            position: absolute;
+            background: var(--y1);
+            border-radius: 2px;
+        }
+        /* diamond shape via two rotated rectangles */
+        .star::before { width: 10px; height: 10px; top: 0; left: 0;
+            clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+        .star::after  { display: none; }
+
+        .star-1  { top:  7%; left:  4%; animation-delay: 0s;   opacity:.55; transform: scale(.9); }
+        .star-2  { top: 13%; right: 6%; animation-delay: .7s;  opacity:.45; transform: scale(1.1); }
+        .star-3  { top: 42%; left:  2%; animation-delay: 1.4s; opacity:.5;  transform: scale(.75); }
+        .star-4  { bottom: 22%; right: 4%; animation-delay: .3s; opacity:.5; transform: scale(1); }
+        .star-5  { bottom:  9%; left: 14%; animation-delay: 2s;  opacity:.4; transform: scale(.8); }
+        .star-6  { top: 68%; right: 8%; animation-delay: 1s;   opacity:.45; transform: scale(.85); }
+
+        @keyframes starTwinkle {
+            0%,100% { opacity:.35; transform: scale(.8) rotate(0deg); }
+            50%      { opacity:.8;  transform: scale(1.2) rotate(20deg); }
+        }
+
+        /* ── sun SVG mascot ── */
+        .sun-mascot {
+            width: 72px; height: 72px;
+            filter: drop-shadow(0 6px 18px rgba(255,165,0,.55));
+            animation: sunSpin 12s linear infinite, sunFloat 3s ease-in-out infinite;
+        }
+        @keyframes sunFloat {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-8px); }
+        }
+        @keyframes sunSpin {
+            from { filter: drop-shadow(0 6px 18px rgba(255,165,0,.55)) hue-rotate(0deg); }
+            to   { filter: drop-shadow(0 6px 18px rgba(255,165,0,.55)) hue-rotate(30deg); }
+        }
+
+        .main-container {
+            width: 100%; max-width: 960px;
+            display: flex; flex-direction: column;
+            gap: 32px; align-items: center;
+            position: relative; z-index: 1;
+        }
+
+        /* ── header ── */
+        .header-section {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 14px; text-align: center;
+        }
+        .badge-apollo {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: var(--dk); padding: 8px 22px; border-radius: 50px;
+            font-size: .9rem; font-weight: 700;
+            box-shadow: 0 4px 16px var(--shw), 0 0 0 4px rgba(255,215,0,.2);
+            letter-spacing: .4px;
+        }
+        .badge-dot {
+            width: 7px; height: 7px; background: var(--dk);
+            border-radius: 50%; opacity: .5;
+        }
+        h1 {
+            font-size: 3rem; font-weight: 800; color: var(--dk);
+            letter-spacing: -1.5px; line-height: 1.05;
+        }
+        h1 .accent {
+            background: linear-gradient(135deg, #E07800, #FFD700);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle { color: var(--mid); font-size: 1rem; font-weight: 500; }
+
+        /* ── portal cards ── */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px,1fr));
+            gap: 24px; width: 100%;
+        }
+        .portal-card {
+            background: var(--warm);
+            border: 2px solid var(--bdr);
+            border-radius: 28px; padding: 32px 28px;
+            display: flex; flex-direction: column;
+            align-items: center; text-align: center; gap: 18px;
+            box-shadow: 0 8px 32px var(--shb), 0 2px 10px var(--shw);
+            transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+            position: relative; overflow: hidden;
+        }
+        /* corner accent circle */
+        .portal-card::before {
+            content: '';
+            position: absolute; top: -40px; right: -40px;
+            width: 130px; height: 130px;
+            background: radial-gradient(circle, rgba(255,215,0,.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .portal-card::after {
+            content: '';
+            position: absolute; bottom: -30px; left: -30px;
+            width: 90px; height: 90px;
+            background: radial-gradient(circle, rgba(255,185,0,.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .portal-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 22px 52px var(--shb), 0 8px 26px var(--shw);
+            border-color: var(--y2);
+        }
+
+        /* icon circle */
+        .card-icon {
+            width: 78px; height: 78px;
+            background: linear-gradient(135deg, #FFD700, #FFC200);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 22px rgba(255,175,0,.4), 0 0 0 7px rgba(255,215,0,.14);
+            transition: transform .22s ease;
+            flex-shrink: 0;
+        }
+        .card-icon svg { width: 32px; height: 32px; color: var(--dk); }
+        .portal-card:hover .card-icon { transform: rotate(12deg) scale(1.1); }
+
+        .card-title { font-size: 1.4rem; font-weight: 800; color: var(--dk); }
+        .card-desc  { font-size: .88rem; color: var(--mid); line-height: 1.65; }
+
+        /* quick links */
+        .quick-links { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .quick-link-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,240,140,.35);
+            border: 1.5px solid rgba(255,210,60,.4);
+            padding: 10px 14px; border-radius: 14px;
+            font-size: .86rem; color: var(--dk); text-decoration: none;
+            font-weight: 500;
+            transition: all .18s ease;
+        }
+        .quick-link-item .left-grp {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .ql-icon {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg,#FFD700,#FFC200);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(255,165,0,.25);
+        }
+        .ql-icon svg { width: 14px; height: 14px; color: var(--dk); }
+        .ql-arrow {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: rgba(255,200,50,.3);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: transform .15s ease;
+        }
+        .ql-arrow svg { width: 11px; height: 11px; color: var(--mid); }
+        .quick-link-item:hover {
+            background: rgba(255,215,0,.32);
+            border-color: var(--y2);
+            transform: translateX(4px);
+        }
+        .quick-link-item:hover .ql-arrow { transform: translateX(3px); }
+
+        /* buttons */
+        .btn-portal {
+            width: 100%; padding: 14px 20px; border: none; border-radius: 18px;
+            font-size: 1rem; font-weight: 700; cursor: pointer;
+            text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            transition: all .2s cubic-bezier(.34,1.56,.64,1);
+            font-family: 'Prompt',sans-serif;
+        }
+        .btn-portal svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .btn-user {
+            background: linear-gradient(135deg,#FFD700,#FFA500);
+            color: var(--dk);
+            box-shadow: 0 6px 22px rgba(255,165,0,.38);
+        }
+        .btn-user:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 30px rgba(255,165,0,.5); }
+        .btn-admin {
+            background: linear-gradient(135deg,#3D2B00,#6B4A00);
+            color: #FFD700;
+            box-shadow: 0 6px 22px rgba(60,40,0,.28);
+        }
+        .btn-admin:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 30px rgba(60,40,0,.38); }
+
+        /* footer */
+        footer {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 12px;
+            font-size: .84rem; color: var(--mid); font-weight: 500;
+        }
+        .divider-dots {
+            display: flex; gap: 6px; align-items: center;
+        }
+        .divider-dots span {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--y2); opacity: .5;
+        }
+        .divider-dots span:nth-child(2) { opacity: .8; transform: scale(1.2); }
+
+        .btn-lyrics {
+            display: inline-flex; align-items: center; gap: 9px;
+            background: linear-gradient(135deg,#FFF0A0,#FFD700);
+            color: var(--dk); border: 2px solid rgba(255,165,0,.45);
+            padding: 10px 24px; border-radius: 50px;
+            font-size: .92rem; font-weight: 700; cursor: pointer;
+            font-family: 'Prompt',sans-serif;
+            box-shadow: 0 4px 16px rgba(255,165,0,.28);
+            transition: all .2s cubic-bezier(.34,1.56,.64,1);
+        }
+        .btn-lyrics svg { width: 16px; height: 16px; }
+        .btn-lyrics:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 24px rgba(255,165,0,.42); }
+
+        /* ── modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(60,40,0,.55); backdrop-filter: blur(6px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; transition: opacity .22s ease;
+        }
+        .modal-overlay.active { opacity: 1; }
+        .modal-card {
+            background: var(--warm); border-radius: 28px;
+            padding: 32px; width: 90%; max-width: 400px;
+            box-shadow: 0 28px 70px rgba(60,40,0,.2);
+            border: 2px solid var(--bdr);
+            animation: modalPop .28s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes modalPop {
+            from { transform: scale(.88) translateY(20px); opacity: 0; }
+            to   { transform: scale(1)   translateY(0);    opacity: 1; }
+        }
+        .modal-header {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 6px;
+        }
+        .modal-icon-wrap {
+            width: 44px; height: 44px; border-radius: 14px;
+            background: linear-gradient(135deg,#FFD700,#FFC200);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; box-shadow: 0 4px 12px rgba(255,165,0,.3);
+        }
+        .modal-icon-wrap svg { width: 22px; height: 22px; color: var(--dk); }
+        .modal-card h3 { font-size: 1.25rem; font-weight: 800; color: var(--dk); }
+        .modal-card p  { font-size: .86rem; color: var(--soft); margin-bottom: 20px; line-height: 1.5; }
+        .input-group { position: relative; margin-bottom: 16px; }
+        .input-group input {
+            width: 100%; padding: 12px 46px 12px 16px;
+            border: 2px solid var(--bdr); border-radius: 14px;
+            font-size: .95rem; outline: none;
+            background: rgba(255,248,200,.45); color: var(--dk);
+            font-family: 'Prompt',sans-serif;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .input-group input:focus {
+            border-color: var(--y2); background: #FFFEF5;
+            box-shadow: 0 0 0 4px rgba(255,165,0,.15);
+        }
+        .toggle-pw {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: var(--soft); display: flex;
+        }
+        .toggle-pw svg { width: 18px; height: 18px; }
+        .error-msg {
+            color: #C62828; font-size: .84rem; margin-bottom: 14px;
+            display: none; background: #FFEBEE; padding: 8px 12px;
+            border-radius: 10px; border: 1px solid #FFCDD2;
+        }
+        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-sm {
+            padding: 10px 20px; border-radius: 12px; font-size: .9rem;
+            font-weight: 700; border: none; cursor: pointer;
+            font-family: 'Prompt',sans-serif; transition: all .18s ease;
+        }
+        .btn-cancel { background: #F0EDE6; color: #888; }
+        .btn-cancel:hover { background: #E0DDD6; }
+        .btn-submit {
+            background: linear-gradient(135deg,#FFD700,#FFA500);
+            color: var(--dk); box-shadow: 0 4px 14px rgba(255,165,0,.35);
+        }
+        .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 7px 20px rgba(255,165,0,.45); }
+
+        /* lyrics modal */
+        .lyrics-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,.82);
+            display: none; justify-content: center; align-items: center;
+            z-index: 2000; opacity: 0; transition: opacity .2s ease;
+            padding: 16px;
+        }
+        .lyrics-overlay.active { opacity: 1; }
+        .lyrics-card {
+            background: var(--warm-white); border-radius: 24px;
+            padding: 20px; width: 100%; max-width: 520px;
+            box-shadow: 0 28px 70px rgba(0,0,0,.45);
+            border: 2px solid var(--border-warm);
+            display: flex; flex-direction: column; gap: 14px;
+            animation: modalPop .28s cubic-bezier(.34,1.56,.64,1);
+        }
+        .lyrics-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .lyrics-card-title {
+            font-size: 1rem; font-weight: 800; color: var(--text-dark);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .lyrics-card-title svg { width: 18px; height: 18px; color: var(--sun-gold); }
+        .lyrics-close {
+            width: 32px; height: 32px; background: #F0EDE6; border: none;
+            border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #888; flex-shrink: 0;
+            transition: all .15s ease;
+        }
+        .lyrics-close:hover { background: #FFD700; color: var(--text-dark); transform: rotate(90deg); }
+        .lyrics-tabs { display: flex; gap: 8px; }
+        .lyrics-tab-btn {
+            flex: 1; padding: 9px 12px; border: 2px solid var(--border-warm);
+            border-radius: 12px; background: rgba(255,248,200,.4);
+            font-size: .88rem; font-weight: 700; color: var(--text-mid);
+            cursor: pointer; font-family: 'Prompt',sans-serif;
+            transition: all .18s ease; display: flex; align-items: center;
+            justify-content: center; gap: 7px;
+        }
+        .lyrics-tab-btn svg { width: 15px; height: 15px; }
+        .lyrics-tab-btn.active {
+            background: linear-gradient(135deg,#FFD700,#FFA500);
+            color: var(--text-dark); border-color: var(--sun-gold);
+            box-shadow: 0 4px 14px rgba(255,165,0,.3);
+        }
+        .lyrics-tab-btn:not(.active):hover { background: rgba(255,215,0,.25); border-color: var(--sun-gold); }
+        .lyrics-img-wrap img {
+            width: 100%; max-height: 65vh; border-radius: 14px;
+            display: block; object-fit: contain;
+            box-shadow: 0 8px 28px rgba(0,0,0,.18);
+        }
+        .lyrics-download-btn {
+            width: 100%; padding: 11px 16px; border: none; border-radius: 14px;
+            background: linear-gradient(135deg,#3D2B00,#6B4A00);
+            color: #FFD700; font-size: .92rem; font-weight: 700;
+            cursor: pointer; font-family: 'Prompt',sans-serif;
+            display: flex; align-items: center; justify-content: center; gap: 9px;
+            transition: all .2s cubic-bezier(.34,1.56,.64,1);
+            box-shadow: 0 4px 14px rgba(60,40,0,.25);
+        }
+        .lyrics-download-btn svg { width: 16px; height: 16px; }
+        .lyrics-download-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(60,40,0,.35); }
+
+        @media (max-width:600px) {
+            h1 { font-size: 2.1rem; }
+            .portal-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- bg decorations -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div class="star star-1"></div>
+<div class="star star-2"></div>
+<div class="star star-3"></div>
+<div class="star star-4"></div>
+<div class="star star-5"></div>
+<div class="star star-6"></div>
+
+<div class="main-container">
+
+    <!-- Header -->
+    <div class="header-section">
+
+        <!-- animated SVG sun -->
+        <svg class="sun-mascot" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="40" cy="40" r="18" fill="#FFD700"/>
+            <circle cx="40" cy="40" r="18" fill="url(#sg)"/>
+            <!-- rays -->
+            <g stroke="#FFA500" stroke-width="3.5" stroke-linecap="round">
+                <line x1="40" y1="6"  x2="40" y2="15"/>
+                <line x1="40" y1="65" x2="40" y2="74"/>
+                <line x1="6"  y1="40" x2="15" y2="40"/>
+                <line x1="65" y1="40" x2="74" y2="40"/>
+                <line x1="14.4" y1="14.4" x2="20.7" y2="20.7"/>
+                <line x1="59.3" y1="59.3" x2="65.6" y2="65.6"/>
+                <line x1="65.6" y1="14.4" x2="59.3" y2="20.7"/>
+                <line x1="20.7" y1="59.3" x2="14.4" y2="65.6"/>
+            </g>
+            <!-- face -->
+            <circle cx="35" cy="38" r="2.2" fill="#3D2B00"/>
+            <circle cx="45" cy="38" r="2.2" fill="#3D2B00"/>
+            <path d="M34 44 Q40 49 46 44" stroke="#3D2B00" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <defs>
+                <radialGradient id="sg" cx="40%" cy="35%" r="60%">
+                    <stop offset="0%" stop-color="#FFF176"/>
+                    <stop offset="100%" stop-color="#FFD700"/>
+                </radialGradient>
+            </defs>
+        </svg>
+
+        <div class="badge-apollo">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            เทพอพอลโล • คณะสีเหลือง
+            <div class="badge-dot"></div>
+        </div>
+        <h1>ผังสแตน<span class="accent">เชียร์</span></h1>
+        <p class="subtitle">ระบบลงทะเบียนและบริหารจัดการที่นั่งสแตนเชียร์</p>
+    </div>
+
+    <!-- Cards -->
+    <div class="portal-grid">
+
+        <!-- User Card -->
+        <div class="portal-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+            <div class="card-title">สำหรับนักเรียน (User)</div>
+            <div class="card-desc">ลงทะเบียนเลือกที่นั่งสแตนเชียร์, ค้นหาที่นั่งของตนเอง หรือแก้ไข/ยกเลิกการจอง</div>
+
+            <div class="quick-links">
+                <a href="./user/user.html?mode=select" class="quick-link-item">
+                    <div class="left-grp">
+                        <div class="ql-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        </div>
+                        <span>เลือกที่ (ยังไม่ได้เลือก)</span>
+                    </div>
+                    <div class="ql-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
+                </a>
+                <a href="./user/user.html?mode=view" class="quick-link-item">
+                    <div class="left-grp">
+                        <div class="ql-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        </div>
+                        <span>ดูที่ (เลือกแล้ว - ไฮไลท์)</span>
+                    </div>
+                    <div class="ql-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
+                </a>
+                <a href="./user/user.html?mode=edit" class="quick-link-item">
+                    <div class="left-grp">
+                        <div class="ql-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+                        </div>
+                        <span>แก้ไขที่ (ใช้รหัสยกเลิก)</span>
+                    </div>
+                    <div class="ql-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
+                </a>
+            </div>
+
+            <a href="./user/user.html" class="btn-portal btn-user">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                เข้าสู่ระบบนักเรียน
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+        <!-- Admin Card -->
+        <div class="portal-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+            </div>
+            <div class="card-title">ผู้ดูแลระบบ (Admin)</div>
+            <div class="card-desc">ตรวจสอบตารางการจองทั้งหมด, ค้นหาข้อมูล, ปลดล็อกที่นั่ง และส่งออกข้อมูล (ต้องใช้รหัสผ่าน)</div>
+            <div style="flex:1;min-height:16px;"></div>
+            <button onclick="openAdminModal()" class="btn-portal btn-admin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                เข้าสู่ระบบ Admin
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="divider-dots"><span></span><span></span><span></span></div>
+        <span>คณะสีเหลือง เทพอพอลโล • ระบบจองที่นั่งสแตนเชียร์</span>
+        <button class="btn-lyrics" onclick="openLyrics()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            เนื้อเพลง
+        </button>
+    </footer>
+</div>
+
+<!-- Lyrics Modal -->
+<div class="lyrics-overlay" id="lyricsOverlay" onclick="closeLyrics(event)">
+    <div class="lyrics-card" onclick="event.stopPropagation()">
+        <div class="lyrics-card-header">
+            <div class="lyrics-card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                เนื้อเพลง
+            </div>
+            <button class="lyrics-close" onclick="closeLyricsBtn()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="lyrics-tabs">
+            <button class="lyrics-tab-btn active" id="tabMorning" onclick="switchLyricsTab('morning')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                ช่วงเช้า
+            </button>
+            <button class="lyrics-tab-btn" id="tabEvening" onclick="switchLyricsTab('evening')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                ช่วงเย็น
+            </button>
+        </div>
+        <div class="lyrics-img-wrap">
+            <img id="lyricsImg" src="./morning.jpg" alt="เนื้อเพลงช่วงเช้า" />
+        </div>
+        <button class="lyrics-download-btn" onclick="downloadLyrics()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            ดาวน์โหลดรูปเนื้อเพลง
+        </button>
+    </div>
+</div>
+
+<!-- Admin Password Modal -->
+<div class="modal-overlay" id="adminModalOverlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h3>เข้าสู่ระบบ Admin</h3>
+        </div>
+        <p>กรุณากรอกรหัสผ่านผู้ดูแลระบบเพื่อดำเนินการต่อ</p>
+        <div class="input-group">
+            <input type="password" id="adminPasswordInput" placeholder="กรอกรหัสผ่าน Admin..." onkeydown="if(event.key==='Enter') verifyAdminPassword()" />
+            <span class="toggle-pw" onclick="togglePasswordVisibility()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+        </div>
+        <div class="error-msg" id="adminPassError">รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</div>
+        <div class="modal-btns">
+            <button class="btn-sm btn-cancel" onclick="closeAdminModal()">ยกเลิก</button>
+            <button class="btn-sm btn-submit" onclick="verifyAdminPassword()">ยืนยันเข้าสู่ระบบ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const LYRICS_IMGS = { morning: './morning.jpg', evening: './evening.jpg' };
+    let currentLyricsTab = 'morning';
+    function openLyrics(){
+        currentLyricsTab='morning';
+        document.getElementById('lyricsImg').src=LYRICS_IMGS.morning;
+        document.getElementById('lyricsImg').alt='เนื้อเพลงช่วงเช้า';
+        document.getElementById('tabMorning').classList.add('active');
+        document.getElementById('tabEvening').classList.remove('active');
+        const o=document.getElementById('lyricsOverlay');
+        o.style.display='flex'; setTimeout(()=>o.classList.add('active'),10);
+    }
+    function switchLyricsTab(tab){
+        currentLyricsTab=tab;
+        const img=document.getElementById('lyricsImg');
+        img.src=LYRICS_IMGS[tab];
+        img.alt=tab==='morning'?'เนื้อเพลงช่วงเช้า':'เนื้อเพลงช่วงเย็น';
+        document.getElementById('tabMorning').classList.toggle('active',tab==='morning');
+        document.getElementById('tabEvening').classList.toggle('active',tab==='evening');
+    }
+    function downloadLyrics(){
+        const a=document.createElement('a');
+        a.href=LYRICS_IMGS[currentLyricsTab];
+        a.download=currentLyricsTab==='morning'?'เนื้อเพลงช่วงเช้า.jpg':'เนื้อเพลงช่วงเย็น.jpg';
+        a.click();
+    }
+    function closeLyricsBtn(){const o=document.getElementById('lyricsOverlay');o.classList.remove('active');setTimeout(()=>{o.style.display='none';},200);}
+    function closeLyrics(e){if(e.target===document.getElementById('lyricsOverlay'))closeLyricsBtn();}
+    function openAdminModal(){
+        const o=document.getElementById('adminModalOverlay');
+        document.getElementById('adminPasswordInput').value='';
+        document.getElementById('adminPassError').style.display='none';
+        o.style.display='flex'; setTimeout(()=>o.classList.add('active'),10);
+        document.getElementById('adminPasswordInput').focus();
+    }
+    function closeAdminModal(){const o=document.getElementById('adminModalOverlay');o.classList.remove('active');setTimeout(()=>{o.style.display='none';},200);}
+    function togglePasswordVisibility(){const i=document.getElementById('adminPasswordInput');i.type=i.type==='password'?'text':'password';}
+    function verifyAdminPassword(){
+        const p=document.getElementById('adminPasswordInput').value.trim();
+        if(p==='yellowisusmah'){sessionStorage.setItem('apollo_admin_auth','true');window.location.href='./admin/Admin.html';}
+        else{document.getElementById('adminPassError').style.display='block';document.getElementById('adminPasswordInput').focus();}
+    }
+</script>
+</body>
+</html>

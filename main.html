@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผังสแตนเชียร์ - คณะสีเหลือง เทพอพอลโล</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-page: #FAF8F5;
+            --bg-card: #FFFFFF;
+            --text-dark: #2B2621;
+            --text-muted: #6E675F;
+            --border-subtle: #E8E2D5;
+            --yellow-accent: #E5A100;
+            --yellow-light: #FFF8E5;
+            --yellow-hover: #C78C00;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Prompt', 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .header-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-apollo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #FFF3CC;
+            color: #8A5A00;
+            border: 1px solid #FFE082;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(229, 161, 0, 0.1);
+        }
+
+        .svg-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #1F1B16;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Choice Cards Grid */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .portal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            border-color: #FFE082;
+        }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--yellow-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8A5A00;
+            border: 1px solid #FFE599;
+        }
+
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .card-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .quick-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .quick-link-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #FAF7F0;
+            border: 1px solid #EFEAE0;
+            padding: 9px 14px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: background 0.15s ease;
+        }
+
+        .quick-link-item:hover {
+            background: #FFF3CC;
+            border-color: #FFE082;
+        }
+
+        .quick-link-item .left-grp {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-portal {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .btn-user {
+            background: var(--yellow-accent);
+            color: #FFFFFF;
+            box-shadow: 0 3px 10px rgba(229, 161, 0, 0.25);
+        }
+
+        .btn-user:hover {
+            background: var(--yellow-hover);
+        }
+
+        .btn-admin {
+            background: #2B2621;
+            color: #FFFFFF;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-admin:hover {
+            background: #433D35;
+        }
+
+        /* Password Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(30, 26, 20, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 28px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+            text-align: left;
+        }
+
+        .modal-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .modal-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .modal-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 40px 10px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--yellow-accent);
+            box-shadow: 0 0 0 3px rgba(229, 161, 0, 0.15);
+        }
+
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            display: flex;
+            align-items: center;
+        }
+
+        .error-msg {
+            color: #D32F2F;
+            font-size: 0.82rem;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .modal-btns {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: #F0EDE6;
+            color: #555;
+        }
+
+        .btn-submit {
+            background: var(--yellow-accent);
+            color: #FFF;
+        }
+
+        footer {
+            margin-top: 16px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+
+        <!-- Header -->
+        <div class="header-section">
+            <div class="badge-apollo">
+                <span class="svg-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </span>
+                <span>เทพอพอลโล • คณะสีเหลือง</span>
+            </div>
+            <h1>ผังสแตนเชียร์</h1>
+            <div class="subtitle">ระบบลงทะเบียนและบริหารจัดการที่นั่งสแตนเชียร์</div>
+        </div>
+
+        <!-- Portal Selector Cards -->
+        <div class="portal-grid">
+
+            <!-- User Card -->
+            <div class="portal-card">
+                <div class="card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <div class="card-title">สำหรับนักเรียน (User)</div>
+                <div class="card-desc">ลงทะเบียนเลือกที่นั่งสแตนเชียร์, ค้นหาที่นั่งของตนเอง หรือแก้ไข/ยกเลิกการจอง</div>
+
+                <div class="quick-links">
+                    <a href="./user/user.html?mode=select" class="quick-link-item">
+                        <div class="left-grp">
+                            <span class="svg-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 19v2M18 19v2M4 11h16M5 11V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6M4 11v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"></path></svg>
+                            </span>
+                            <span>เลือกที่ (ยังไม่ได้เลือก)</span>
+                        </div>
+                        <span>&rarr;</span>
+                    </a>
+                    <a href="./user/user.html?mode=view" class="quick-link-item">
+                        <div class="left-grp">
+                            <span class="svg-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            </span>
+                            <span>ดูที่ (เลือกแล้ว - ไฮไลท์)</span>
+                        </div>
+                        <span>&rarr;</span>
+                    </a>
+                    <a href="./user/user.html?mode=edit" class="quick-link-item">
+                        <div class="left-grp">
+                            <span class="svg-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </span>
+                            <span>แก้ไขที่ (ใช้รหัสยกเลิก)</span>
+                        </div>
+                        <span>&rarr;</span>
+                    </a>
+                </div>
+
+                <a href="./user/user.html" class="btn-portal btn-user">
+                    <span>เข้าสู่ระบบนักเรียน</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+
+            <!-- Admin Card -->
+            <div class="portal-card">
+                <div class="card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <div class="card-title">ผู้ดูแลระบบ (Admin)</div>
+                <div class="card-desc">ตรวจสอบตารางการจองทั้งหมด, ค้นหาข้อมูล, ปลดล็อกที่นั่ง และส่งออกข้อมูล (ต้องใช้รหัสผ่าน)</div>
+
+                <div style="flex: 1;"></div>
+
+                <button onclick="openAdminModal()" class="btn-portal btn-admin">
+                    <span>เข้าสู่ระบบ Admin</span>
+                    <span class="svg-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </span>
+                </button>
+            </div>
+
+        </div>
+
+        <footer>
+            &copy; คณะสีเหลือง เทพอพอลโล • ระบบจองที่นั่งสแตนเชียร์
+        </footer>
+
+    </div>
+
+    <!-- Admin Password Modal -->
+    <div class="modal-overlay" id="adminModalOverlay">
+        <div class="modal-card">
+            <div class="modal-card-header">
+                <span class="svg-icon" style="color:var(--yellow-accent);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </span>
+                <h3>เข้าสู่ระบบ Admin</h3>
+            </div>
+            <p>กรุณากรอกรหัสผ่านผู้ดูแลระบบเพื่อดำเนินการต่อ</p>
+
+            <div class="input-group">
+                <input type="password" id="adminPasswordInput" placeholder="กรอกรหัสผ่าน Admin..." onkeydown="if(event.key==='Enter') verifyAdminPassword()" />
+                <span class="toggle-pw" onclick="togglePasswordVisibility()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </span>
+            </div>
+
+            <div class="error-msg" id="adminPassError">รหัสผ่านไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง</div>
+
+            <div class="modal-btns">
+                <button class="btn-sm btn-cancel" onclick="closeAdminModal()">ยกเลิก</button>
+                <button class="btn-sm btn-submit" onclick="verifyAdminPassword()">ยืนยันเข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAdminModal() {
+            const overlay = document.getElementById('adminModalOverlay');
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminPassError').style.display = 'none';
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+            document.getElementById('adminPasswordInput').focus();
+        }
+
+        function closeAdminModal() {
+            const overlay = document.getElementById('adminModalOverlay');
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 200);
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('adminPasswordInput');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function verifyAdminPassword() {
+            const pass = document.getElementById('adminPasswordInput').value.trim();
+            if (pass === 'yellowisusmah') {
+                sessionStorage.setItem('apollo_admin_auth', 'true');
+                window.location.href = './admin/Admin.html';
+            } else {
+                document.getElementById('adminPassError').style.display = 'block';
+                document.getElementById('adminPasswordInput').focus();
+            }
+        }
+    </script>
+</body>
+
+</html>
