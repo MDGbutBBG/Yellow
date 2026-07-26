@@ -446,9 +446,9 @@
 
     function fetchAdminData(){
         loadLocalData(); renderAdminTable();
-        fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'get'})})
+        fetch(SCRIPT_URL,{method:'POST',cache:'no-store',body:JSON.stringify({action:'get'})})
         .then(r=>r.json())
-        .then(data=>{ if(data&&typeof data==='object'){bookedData={...bookedData,...data};saveLocalData();renderAdminTable();} })
+        .then(data=>{ if(data&&typeof data==='object'){bookedData=data;saveLocalData();renderAdminTable();} })
         .catch(err=>{ console.error(err); });
     }
 
@@ -551,7 +551,11 @@
     function closeLyricsBtn(){const o=document.getElementById('lyricsOverlay');o.classList.remove('active');setTimeout(()=>{o.style.display='none';},200);}
     function closeLyrics(e){if(e.target===document.getElementById('lyricsOverlay'))closeLyricsBtn();}
 
-    window.onload=checkAuth;
+    window.onload=function(){
+        checkAuth();
+        setInterval(()=>{if(sessionStorage.getItem('apollo_admin_auth')==='true')fetchAdminData();},5000);
+        window.addEventListener('focus',()=>{if(sessionStorage.getItem('apollo_admin_auth')==='true')fetchAdminData();});
+    };
 </script>
 </body>
 </html>

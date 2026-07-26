@@ -33,16 +33,6 @@ function doPost(e) {
             const result = cancelSeat(data.seatId, data.cancelPass);
             return responseJSON(result);
         }
-        else if (action === 'edit') {
-            const result = editSeat(
-                data.seatId,
-                data.cancelPass,
-                data.studentName,
-                data.className,
-                data.studentNo
-            );
-            return responseJSON(result);
-        }
         else if (action === 'admin_clear') {
             const result = adminClearSeat(data.adminPass, data.seatId);
             return responseJSON(result);
@@ -157,39 +147,32 @@ function reserveSeat(seatId, studentName, className, studentNo, studentPass, can
 }
 
 function cancelSeat(seatId, cancelPass) {
-    const sheet = getSheet();
-    const data = sheet.getDataRange().getValues();
-
-    for (let i = 1; i < data.length; i++) {
-        const currentSeat = data[i][0] ? data[i][0].toString().trim() : '';
-        const storedCancelPass = data[i][5] ? data[i][5].toString().trim() : '';
-
-        if ((currentSeat === seatId || !seatId) && storedCancelPass === cancelPass) {
-            sheet.deleteRow(i + 1);
-            return { success: true, message: 'ยกเลิกการจองที่นั่งสำเร็จ เรียบร้อยแล้ว!' };
-        }
+    const lock = LockService.getScriptLock();
+    try {
+        lock.waitLock(10000);
+    } catch (e) {
+        return { success: false, message: 'ระบบกำลังประมวลผล กรุณาลองใหม่อีกครั้ง' };
     }
 
-    return { success: false, message: 'รหัสยกเลิก (8 หลัก) หรือรหัสที่นั่งไม่ถูกต้อง!' };
-}
+    try {
+        const sheet = getSheet();
+        const data = sheet.getDataRange().getValues();
 
-function editSeat(seatId, cancelPass, newName, newClass, newNo) {
-    const sheet = getSheet();
-    const data = sheet.getDataRange().getValues();
+        for (let i = 1; i < data.length; i++) {
+            const currentSeat = data[i][0] ? data[i][0].toString().trim() : '';
+            const storedCancelPass = data[i][5] ? data[i][5].toString().trim() : '';
 
-    for (let i = 1; i < data.length; i++) {
-        const currentSeat = data[i][0] ? data[i][0].toString().trim() : '';
-        const storedCancelPass = data[i][5] ? data[i][5].toString().trim() : '';
-
-        if (currentSeat === seatId && storedCancelPass === cancelPass) {
-            sheet.getRange(i + 1, 2).setValue(newName);
-            sheet.getRange(i + 1, 3).setValue(newClass);
-            sheet.getRange(i + 1, 4).setValue(newNo);
-            return { success: true, message: 'อัปเดตข้อมูลส่วนตัวสำเร็จ!' };
+            if ((currentSeat === seatId || !seatId) && storedCancelPass === cancelPass) {
+                sheet.deleteRow(i + 1);
+                SpreadsheetApp.flush();
+                return { success: true, message: 'ยกเลิกการจองที่นั่งสำเร็จ เรียบร้อยแล้ว!' };
+            }
         }
-    }
 
-    return { success: false, message: 'รหัสยกเลิกไม่ถูกต้อง ไม่สามารถแก้ไขข้อมูลได้!' };
+        return { success: false, message: 'รหัสยกเลิก (8 หลัก) หรือรหัสที่นั่งไม่ถูกต้อง!' };
+    } finally {
+        lock.releaseLock();
+    }
 }
 
 function adminClearSeat(adminPass, seatId) {
