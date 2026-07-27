@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผังสแตนเชียร์ - ระบบนักเรียน (User)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --y1: #FFD700;
+            --y2: #FFA500;
+            --warm: #FFFEF5;
+            --dk: #3D2B00;
+            --mid: #7A5500;
+            --soft: #A07820;
+            --bdr: rgba(255, 210, 60, .45);
+            --shw: rgba(255, 200, 0, .2);
+            --shb: rgba(60, 40, 0, .07);
+            --m1-3: #ff2222;
+            --m1-9: #8aff3c;
+            --m2-9: #006eff;
+            --m3-1: #fffb05;
+            --m3-5: #00ff84;
+            --m3-2: #7900d6;
+            --m2-11: #ff24ed;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Prompt', 'Sarabun', sans-serif;
+            background: linear-gradient(155deg, #FFFDE7 0%, #FFF3CD 50%, #FFE09A 100%);
+            min-height: 100vh;
+            padding: 24px 16px 56px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* bg blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 215, 0, .14) 0%, transparent 68%);
+            top: -120px;
+            right: -120px;
+            animation: blobFloat 9s ease-in-out infinite;
+        }
+
+        .blob-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 160, 0, .1) 0%, transparent 68%);
+            bottom: -80px;
+            left: -80px;
+            animation: blobFloat 11s ease-in-out infinite reverse;
+        }
+
+        @keyframes blobFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            50% {
+                transform: translate(16px, -18px) scale(1.05)
+            }
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1140px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* nav */
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--mid);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 600;
+            background: var(--warm);
+            padding: 8px 18px;
+            border-radius: 50px;
+            border: 2px solid var(--bdr);
+            box-shadow: 0 2px 10px var(--shb);
+            transition: all .2s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .btn-back svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .btn-back:hover {
+            background: #FFF8CC;
+            border-color: var(--y2);
+            transform: translateX(-3px);
+        }
+
+        .header-title {
+            text-align: center;
+            flex: 1;
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--dk);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header-title h1 .accent {
+            background: linear-gradient(135deg, #E07800, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: .88rem;
+            color: var(--soft);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* sun mini */
+        .sun-mini {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 3px 8px rgba(255, 165, 0, .45));
+            animation: sunFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes sunFloat {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-5px)
+            }
+        }
+
+        /* tabs */
+        .tabs-container {
+            display: flex;
+            background: rgba(255, 220, 80, .22);
+            padding: 5px;
+            border-radius: 20px;
+            gap: 5px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid var(--bdr);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 15px;
+            background: transparent;
+            color: var(--soft);
+            font-size: .86rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all .2s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .tab-btn svg {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #FFD700, #FFC200);
+            color: var(--dk);
+            box-shadow: 0 4px 14px var(--shw);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: rgba(255, 215, 0, .2);
+        }
+
+        /* panel card */
+        .panel-card {
+            background: var(--warm);
+            border: 2px solid var(--bdr);
+            border-radius: 24px;
+            padding: 18px 22px;
+            box-shadow: 0 4px 20px var(--shb), 0 2px 8px var(--shw);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .top-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .stats-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 240, 140, .35);
+            padding: 7px 14px;
+            border-radius: 50px;
+            border: 1.5px solid var(--bdr);
+            font-size: .86rem;
+            font-weight: 500;
+            color: var(--dk);
+        }
+
+        .stat-item svg {
+            width: 14px;
+            height: 14px;
+            color: var(--soft);
+            flex-shrink: 0;
+        }
+
+        .stat-item strong {
+            color: var(--mid);
+            font-weight: 700;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .dot-green {
+            background: #2E7D32;
+        }
+
+        .dot-red {
+            background: #C62828;
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 260px;
+            flex: 1;
+            max-width: 380px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 9px 12px 9px 36px;
+            background: rgba(255, 248, 200, .5);
+            border: 2px solid var(--bdr);
+            border-radius: 14px;
+            font-size: .88rem;
+            color: var(--dk);
+            outline: none;
+            font-family: 'Prompt', sans-serif;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .search-box input:focus {
+            background: #FFFEF5;
+            border-color: var(--y2);
+            box-shadow: 0 0 0 4px rgba(255, 165, 0, .15);
+        }
+
+        .search-box .icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--soft);
+            display: flex;
+        }
+
+        .search-box .icon svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        /* legend */
+        .legend-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px 18px;
+            padding-top: 12px;
+            border-top: 2px dashed rgba(255, 210, 60, .4);
+        }
+
+        .legend-tag {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: .82rem;
+            color: var(--dk);
+            font-weight: 600;
+        }
+
+        .swatch {
+            width: 16px;
+            height: 16px;
+            border-radius: 5px;
+            border: 1.5px solid rgba(0, 0, 0, .12);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+        }
+
+        /* edit box */
+        .edit-box-card {
+            background: linear-gradient(135deg, #FFFDE7, #FFF9C4);
+            border: 2px solid rgba(255, 200, 50, .6);
+            border-radius: 22px;
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 640px;
+            margin: 0 auto;
+            width: 100%;
+            box-shadow: 0 4px 18px var(--shw);
+        }
+
+        .edit-box-card h3 {
+            font-size: 1.05rem;
+            color: var(--mid);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 700;
+        }
+
+        .edit-box-card h3 svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .edit-box-card p {
+            font-size: .85rem;
+            color: var(--soft);
+            font-weight: 500;
+        }
+
+        .edit-inputs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .edit-inputs input {
+            flex: 1;
+            min-width: 180px;
+            padding: 10px 14px;
+            border: 2px solid var(--bdr);
+            border-radius: 14px;
+            font-size: .9rem;
+            outline: none;
+            font-family: 'Prompt', sans-serif;
+            background: rgba(255, 255, 255, .7);
+            color: var(--dk);
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .edit-inputs input:focus {
+            border-color: var(--y2);
+            box-shadow: 0 0 0 4px rgba(255, 165, 0, .15);
+            background: #fff;
+        }
+
+        /* stand container */
+        .stand-container {
+            background: var(--warm);
+            border: 2px solid var(--bdr);
+            border-radius: 24px;
+            padding: 22px;
+            box-shadow: 0 4px 20px var(--shb);
+            overflow-x: auto;
+        }
+
+        .stand-label {
+            font-size: .82rem;
+            color: var(--soft);
+            text-align: right;
+            margin-bottom: 10px;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .seat-grid {
+            display: grid;
+            grid-template-columns: 44px repeat(20, minmax(44px, 1fr));
+            gap: 5px;
+            min-width: 960px;
+            margin-bottom: 16px;
+        }
+
+        .grid-header {
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFF8CC, #FFE566);
+            color: var(--mid);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: .76rem;
+            min-height: 32px;
+            border: 1.5px solid rgba(255, 200, 50, .5);
+        }
+
+        .seat {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .67rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform .15s cubic-bezier(.34, 1.56, .64, 1), box-shadow .15s;
+            user-select: none;
+            padding: 2px;
+            word-break: break-all;
+            line-height: 1.15;
+            text-align: center;
+            color: #3D2B00;
+            border: 1.5px solid rgba(0, 0, 0, .1);
+            background: #fff;
+        }
+
+        .seat:hover:not(.booked) {
+            transform: translateY(-3px) scale(1.08);
+            box-shadow: 0 6px 16px rgba(255, 165, 0, .4);
+            border-color: var(--y2);
+            z-index: 2;
+        }
+
+        .seat.booked {
+            background: #E0E0E0 !important;
+            cursor: not-allowed;
+            border: 1.5px solid #C8C8C8;
+            color: #999;
+            font-weight: 400;
+            box-shadow: none;
+            opacity: .75;
+        }
+
+        .seat.highlight {
+            border: 3px solid var(--y1) !important;
+            box-shadow: 0 0 14px rgba(255, 180, 0, .8);
+            transform: scale(1.14);
+            z-index: 5;
+            animation: pulseGlow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from {
+                box-shadow: 0 0 8px rgba(255, 165, 0, .5)
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(255, 165, 0, .95)
+            }
+        }
+
+        .c-m1-3 {
+            background-color: var(--m1-3)
+        }
+
+        .c-m1-9 {
+            background-color: var(--m1-9)
+        }
+
+        .c-m2-9 {
+            background-color: var(--m2-9)
+        }
+
+        .c-m3-1 {
+            background-color: var(--m3-1)
+        }
+
+        .c-m3-5 {
+            background-color: var(--m3-5)
+        }
+
+        .c-m3-2 {
+            background-color: var(--m3-2)
+        }
+
+        .c-m2-11 {
+            background-color: var(--m2-11)
+        }
+
+        .stage-banner {
+            background: linear-gradient(135deg, #FFD700, #FFC200);
+            border: 2px solid rgba(255, 180, 0, .6);
+            color: var(--dk);
+            text-align: center;
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: .95rem;
+            letter-spacing: 1px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 16px var(--shw);
+        }
+
+        .stage-banner svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(60, 40, 0, .5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity .2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--warm);
+            border-radius: 28px;
+            padding: 28px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 20px 60px rgba(60, 40, 0, .18);
+            border: 2px solid var(--bdr);
+            animation: modalPop .28s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(.88) translateY(16px);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .modal-icon-wrap {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #FFD700, #FFC200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(255, 165, 0, .3);
+        }
+
+        .modal-icon-wrap svg {
+            width: 20px;
+            height: 20px;
+            color: var(--dk);
+        }
+
+        .modal h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--dk);
+        }
+
+        .modal-sub {
+            color: var(--soft);
+            font-size: .86rem;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 12px;
+            flex: 1;
+        }
+
+        .form-group label {
+            font-size: .82rem;
+            color: var(--dk);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group label svg {
+            width: 13px;
+            height: 13px;
+            color: var(--soft);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 13px;
+            background: rgba(255, 248, 200, .45);
+            border: 2px solid var(--bdr);
+            border-radius: 13px;
+            font-size: .9rem;
+            color: var(--dk);
+            outline: none;
+            font-family: 'Prompt', sans-serif;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            background: #FFFEF5;
+            border-color: var(--y2);
+            box-shadow: 0 0 0 4px rgba(255, 165, 0, .15);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: .9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: 'Prompt', sans-serif;
+            transition: all .2s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .btn svg {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: var(--dk);
+            box-shadow: 0 4px 14px rgba(255, 165, 0, .4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 165, 0, .5);
+        }
+
+        .btn-primary:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #F0EDE6;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #E2DFD7;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #E53935, #C62828);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(198, 40, 40, .35);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(198, 40, 40, .45);
+        }
+
+        /* toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: var(--warm);
+            border: 2px solid var(--bdr);
+            border-left: 5px solid var(--y1);
+            color: var(--dk);
+            padding: 11px 18px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px var(--shb);
+            font-size: .87rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn .25s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .toast svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            color: var(--y2);
+        }
+
+        .toast.error {
+            border-left-color: #E53935;
+        }
+
+        .toast.error svg {
+            color: #E53935;
+        }
+
+        @keyframes toastIn {
+            from {
+                transform: translateX(40px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        /* lyrics fab */
+        .lyrics-fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: var(--dk);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 165, 0, .5);
+            z-index: 999;
+            transition: transform .2s cubic-bezier(.34, 1.56, .64, 1), box-shadow .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lyrics-fab svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .lyrics-fab:hover {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 10px 28px rgba(255, 165, 0, .6);
+        }
+
+        .lyrics-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .82);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity .2s ease;
+            padding: 16px;
+        }
+
+        .lyrics-overlay.active {
+            opacity: 1;
+        }
+
+        .lyrics-card {
+            background: var(--warm-white);
+            border-radius: 24px;
+            padding: 20px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 28px 70px rgba(0, 0, 0, .45);
+            border: 2px solid var(--border-warm);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            animation: modalPop .28s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .lyrics-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .lyrics-card-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--dk);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lyrics-card-title svg {
+            width: 18px;
+            height: 18px;
+            color: var(--gold);
+        }
+
+        .lyrics-close {
+            width: 32px;
+            height: 32px;
+            background: #F0EDE6;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            flex-shrink: 0;
+            transition: all .15s ease;
+        }
+
+        .lyrics-close:hover {
+            background: #FFD700;
+            color: var(--dk);
+            transform: rotate(90deg);
+        }
+
+        .lyrics-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lyrics-tab-btn {
+            flex: 1;
+            padding: 9px 12px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 248, 200, .4);
+            font-size: .88rem;
+            font-weight: 700;
+            color: var(--mid);
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            transition: all .18s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .lyrics-tab-btn svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .lyrics-tab-btn.active {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: var(--dk);
+            border-color: var(--gold);
+            box-shadow: 0 4px 14px rgba(255, 165, 0, .3);
+        }
+
+        .lyrics-tab-btn:not(.active):hover {
+            background: rgba(255, 215, 0, .25);
+            border-color: var(--gold);
+        }
+
+        .lyrics-img-wrap img {
+            width: 100%;
+            max-height: 65vh;
+            border-radius: 14px;
+            display: block;
+            object-fit: contain;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, .18);
+        }
+
+        .lyrics-download-btn {
+            width: 100%;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #3D2B00, #6B4A00);
+            color: #FFD700;
+            font-size: .92rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            transition: all .2s cubic-bezier(.34, 1.56, .64, 1);
+            box-shadow: 0 4px 14px rgba(60, 40, 0, .25);
+        }
+
+        .lyrics-download-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .lyrics-download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(60, 40, 0, .35);
+        }
+
+        @media(max-width:600px) {
+            .nav-header {
+                flex-direction: column;
+                text-align: center
+            }
+
+            .tabs-container {
+                flex-direction: column
+            }
+
+            .form-row {
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="app-container">
+        <!-- Nav -->
+        <div class="nav-header">
+            <a href="../index.html" class="btn-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M19 12H5M12 5l-7 7 7 7" />
+                </svg>
+                หน้าหลัก
+            </a>
+            <div class="header-title">
+                <h1>
+                    <svg class="sun-mini" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="40" cy="40" r="18" fill="url(#sg2)" />
+                        <g stroke="#FFA500" stroke-width="3.5" stroke-linecap="round">
+                            <line x1="40" y1="6" x2="40" y2="15" />
+                            <line x1="40" y1="65" x2="40" y2="74" />
+                            <line x1="6" y1="40" x2="15" y2="40" />
+                            <line x1="65" y1="40" x2="74" y2="40" />
+                            <line x1="14.4" y1="14.4" x2="20.7" y2="20.7" />
+                            <line x1="59.3" y1="59.3" x2="65.6" y2="65.6" />
+                            <line x1="65.6" y1="14.4" x2="59.3" y2="20.7" />
+                            <line x1="20.7" y1="59.3" x2="14.4" y2="65.6" />
+                        </g>
+                        <circle cx="35" cy="38" r="2.2" fill="#3D2B00" />
+                        <circle cx="45" cy="38" r="2.2" fill="#3D2B00" />
+                        <path d="M34 44 Q40 49 46 44" stroke="#3D2B00" stroke-width="2" stroke-linecap="round"
+                            fill="none" />
+                        <defs>
+                            <radialGradient id="sg2" cx="40%" cy="35%" r="60%">
+                                <stop offset="0%" stop-color="#FFF176" />
+                                <stop offset="100%" stop-color="#FFD700" />
+                            </radialGradient>
+                        </defs>
+                    </svg>
+                    ผังสแตน<span class="accent">เชียร์</span>
+                </h1>
+                <p>คณะสีเหลือง เทพอพอลโล &nbsp;•&nbsp; เลือก จอง ดู และแก้ไขที่นั่ง</p>
+            </div>
+            <div style="width:110px;"></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <button class="tab-btn active" id="tabSelect" onclick="switchMode('select')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                เลือกที่ (ยังไม่ได้เลือก)
+            </button>
+            <button class="tab-btn" id="tabView" onclick="switchMode('view')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                ดูที่ (เลือกแล้ว)
+            </button>
+            <button class="tab-btn" id="tabEdit" onclick="switchMode('edit')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" />
+                </svg>
+                ยกเลิกที่ (รหัสยกเลิก)
+            </button>
+        </div>
+
+        <!-- Edit Panel -->
+        <div class="edit-box-card" id="editBoxPanel" style="display:none;">
+            <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" />
+                </svg>
+                ยกเลิกที่นั่ง
+            </h3>
+            <p>กรอกรหัสยกเลิก (8 หลัก) ที่ท่านได้รับตอนจองที่นั่ง เพื่อยกเลิกการจองและคืนที่นั่ง</p>
+            <div class="edit-inputs">
+                <input type="text" id="cancelPassLookupInput" placeholder="กรอกรหัสยกเลิก 8 หลัก..." maxlength="8" />
+                <button class="btn btn-primary" onclick="handleCancelPassLookup()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    ค้นหาเพื่อยกเลิก
+                </button>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="panel-card">
+            <div class="top-row">
+                <div class="stats-summary">
+                    <div class="stat-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" rx="1" />
+                            <rect x="14" y="3" width="7" height="7" rx="1" />
+                            <rect x="3" y="14" width="7" height="7" rx="1" />
+                            <rect x="14" y="14" width="7" height="7" rx="1" />
+                        </svg>
+                        ที่นั่งทั้งหมด: <strong id="statTotal">180</strong>
+                    </div>
+                    <div class="stat-item"><span class="dot dot-green"></span> ว่าง: <strong id="statAvailable"
+                            style="color:#2E7D32;">180</strong></div>
+                    <div class="stat-item"><span class="dot dot-red"></span> จองแล้ว: <strong id="statBooked"
+                            style="color:#C62828;">0</strong></div>
+                    <div class="stat-item"><span class="dot dot-green" id="statStatusDot"></span> สถานะ: <strong
+                            id="statStatus" style="color:#2E7D32;">พร้อมใช้งาน</strong></div>
+                </div>
+                <div class="search-box">
+                    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg></span>
+                    <input type="text" id="searchInput" placeholder="ค้นหาชื่อ, เลขที่ หรือรหัสที่นั่ง (ไฮไลท์)..."
+                        oninput="handleSearch()" />
+                </div>
+            </div>
+            <div class="legend-row">
+                <div class="legend-tag">
+                    <div class="swatch" style="background:var(--m1-3)"></div>ม.1/3
+                </div>
+                <div class="legend-tag">
+                    <div class="swatch" style="background:var(--m1-9)"></div>ม.1/9
+                </div>
+                <div class="legend-tag">
+                    <div class="swatch" style="background:var(--m2-9)"></div>ม.2/9
+                </div>
+                <div class="legend-tag">
+                    <div class="swatch" style="background:var(--m3-1)"></div>ม.3/1
+                </div>
+                <div class="legend-tag">
+                    <div class="swatch" style="background:var(--m3-5)"></div>ม.3/5
+                </div>
+                <div class="legend-tag">
+                    <div class="swatch" style="background:var(--m3-2)"></div>ม.3/2
+                </div>
+                <div class="legend-tag">
+                    <div class="swatch" style="background:var(--m2-11)"></div>ม.2/11
+                </div>
+            </div>
+        </div>
+
+        <!-- Seat Grid -->
+        <div class="stand-container">
+            <div class="stand-label">▲ ด้านหลังสแตนเชียร์ (แถวบนสุด I)</div>
+            <div class="seat-grid" id="seatGrid"></div>
+            <div class="stage-banner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+                เวที / ด้านหน้าสแตนเชียร์ (STAGE)
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+            </div>
+        </div>
+
+    </div><!-- end .app-container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                </div>
+                <h3 id="modalTitle">จองที่นั่งสแตนเชียร์</h3>
+            </div>
+            <div class="modal-sub" id="modalSubtitle"></div>
+            <div class="form-group">
+                <label for="studentNameInput">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    ชื่อ-นามสกุล
+                </label>
+                <input type="text" id="studentNameInput" placeholder="กรอกชื่อ-นามสกุล" autocomplete="off" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="classNameInput">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                        ชั้นเรียน
+                    </label>
+                    <select id="classNameInput">
+                        <option value="ม.1/3">ม.1/3</option>
+                        <option value="ม.1/9">ม.1/9</option>
+                        <option value="ม.2/9">ม.2/9</option>
+                        <option value="ม.3/1">ม.3/1</option>
+                        <option value="ม.3/5">ม.3/5</option>
+                        <option value="ม.3/2">ม.3/2</option>
+                        <option value="ม.2/11">ม.2/11</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="studentNoInput">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6" />
+                            <line x1="8" y1="12" x2="21" y2="12" />
+                            <line x1="8" y1="18" x2="21" y2="18" />
+                            <line x1="3" y1="6" x2="3.01" y2="6" />
+                            <line x1="3" y1="12" x2="3.01" y2="12" />
+                            <line x1="3" y1="18" x2="3.01" y2="18" />
+                        </svg>
+                        เลขที่
+                    </label>
+                    <input type="number" id="studentNoInput" placeholder="เช่น 15" autocomplete="off" min="1" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="studentPassInput">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    รหัสประจำตัว (7 หลัก)
+                </label>
+                <input type="text" id="studentPassInput" placeholder="รหัส 7 หลัก เช่น 1234567" maxlength="7"
+                    autocomplete="off" />
+            </div>
+            <div class="form-group">
+                <label for="cancelPassInput">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    รหัสยกเลิกสำหรับเปลี่ยนที่ (8 หลัก)
+                </label>
+                <input type="text" id="cancelPassInput" placeholder="ตั้งรหัสยกเลิก 8 หลัก เช่น 87654321" maxlength="8"
+                    autocomplete="off" />
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="confirmBooking()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    ยืนยันการจอง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancellation Modal -->
+    <div class="modal-overlay" id="editModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" />
+                    </svg>
+                </div>
+                <h3>ยกเลิกที่นั่ง <span id="editSeatIdBadge" style="color:var(--y2);"></span></h3>
+            </div>
+            <div class="modal-sub" id="editModalSub"></div>
+            <div class="modal-actions" style="justify-content:space-between;">
+                <button class="btn btn-danger" onclick="confirmCancelBooking()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    ยกเลิกการจอง (คืนที่)
+                </button>
+                <button class="btn btn-secondary" onclick="closeEditModal()">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lyrics FAB -->
+    <button class="lyrics-fab" onclick="openLyrics()" title="เนื้อเพลง">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13" />
+            <circle cx="6" cy="18" r="3" />
+            <circle cx="18" cy="16" r="3" />
+        </svg>
+    </button>
+
+    <!-- Lyrics Modal -->
+    <div class="lyrics-overlay" id="lyricsOverlay" onclick="closeLyrics(event)">
+        <div class="lyrics-card" onclick="event.stopPropagation()">
+            <div class="lyrics-card-header">
+                <div class="lyrics-card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13" />
+                        <circle cx="6" cy="18" r="3" />
+                        <circle cx="18" cy="16" r="3" />
+                    </svg>
+                    เนื้อเพลง
+                </div>
+                <button class="lyrics-close" onclick="closeLyricsBtn()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round" style="width:14px;height:14px">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="lyrics-tabs">
+                <button class="lyrics-tab-btn active" id="tabMorning" onclick="switchLyricsTab('morning')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                    ช่วงเช้า
+                </button>
+                <button class="lyrics-tab-btn" id="tabEvening" onclick="switchLyricsTab('evening')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                    ช่วงเย็น
+                </button>
+            </div>
+            <div class="lyrics-img-wrap">
+                <img id="lyricsImg" src="../morning.jpg" alt="เนื้อเพลงช่วงเช้า" />
+            </div>
+            <button class="lyrics-download-btn" onclick="downloadLyrics()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                ดาวน์โหลดรูปเนื้อเพลง
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbtyqRo3A3orWFyCqtGv1yESs3Qtfkjn7D9vIHsCUeFtArPXXnZJ2B7XLRjI0csuKf/exec";
+        const STORAGE_KEY = "apollo_stand_bookings_v2";
+        const rows = ['I', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'];
+        let currentMode = 'select', selectedSeat = null, activeEditBooking = null, bookedData = {};
+
+        function getSeatClass(row, col) {
+            if (row === 'I') return col <= 2 ? 'c-m1-9' : 'c-m1-3';
+            if (row === 'H') return col <= 12 ? 'c-m1-9' : 'c-m2-9';
+            if (row === 'G') return 'c-m2-9'; if (row === 'F') return 'c-m3-1';
+            if (row === 'E') return col <= 12 ? 'c-m3-5' : 'c-m3-2'; if (row === 'D') return 'c-m3-2';
+            if (row === 'C') return col === 5 ? 'c-m3-5' : (col < 5 ? 'c-m1-9' : 'c-m1-3');
+            if (row === 'B') return col <= 15 ? 'c-m1-9' : 'c-m2-11'; if (row === 'A') return 'c-m2-11'; return '';
+        }
+        function getClassNameText(row, col) {
+            const map = { 'c-m1-3': 'ม.1/3', 'c-m1-9': 'ม.1/9', 'c-m2-9': 'ม.2/9', 'c-m3-1': 'ม.3/1', 'c-m3-5': 'ม.3/5', 'c-m3-2': 'ม.3/2', 'c-m2-11': 'ม.2/11' };
+            return map[getSeatClass(row, col)] || '';
+        }
+        function isDateString(val) {
+            if (typeof val !== 'string') return false;
+            const s = val.trim(); if (!s) return false;
+            if (/^\d{4}-\d{2}-\d{2}/.test(s)) return true;
+            if (/(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i.test(s)) return true;
+            if (/GMT[+-]\d{4}/i.test(s) || /เวลาอินโดจีน/i.test(s) || /Indochina Time/i.test(s)) return true;
+            return false;
+        }
+
+        const ICON_OK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#2E7D32"><polyline points="20 6 9 17 4 12"/></svg>`;
+        const ICON_ERR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#E53935"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+        const ICON_SPIN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;animation:spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+
+        function showToast(message, isError = false) {
+            if (!document.getElementById('toastSpin')) {
+                const st = document.createElement('style'); st.id = 'toastSpin';
+                st.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+                document.head.appendChild(st);
+            }
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div'); t.className = `toast ${isError ? 'error' : ''}`;
+            t.innerHTML = (isError ? ICON_ERR : ICON_OK) + `<span>${message}</span>`;
+            c.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(40px)'; t.style.transition = 'all .2s ease'; setTimeout(() => t.remove(), 200); }, 3000);
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            ['select', 'view', 'edit'].forEach(m => {
+                document.getElementById('tab' + m.charAt(0).toUpperCase() + m.slice(1)).classList.toggle('active', mode === m);
+            });
+            document.getElementById('editBoxPanel').style.display = (mode === 'edit') ? 'flex' : 'none';
+            const si = document.getElementById('searchInput');
+            si.placeholder = mode === 'view' ? 'พิมพ์ชื่อ, เลขที่ หรือรหัส 7 หลัก เพื่อไฮไลท์ที่นั่ง...' : 'ค้นหาชื่อ, เลขที่ หรือรหัสที่นั่ง (ไฮไลท์)...';
+            if (mode === 'view') si.focus();
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('seatGrid'); grid.innerHTML = '';
+            grid.appendChild(createHeaderCell('ที่นั่ง'));
+            for (let c = 1; c <= 20; c++) grid.appendChild(createHeaderCell(c));
+            let bookedCount = 0;
+            const searchTerm = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+            rows.forEach(row => {
+                grid.appendChild(createHeaderCell(row));
+                for (let col = 1; col <= 20; col++) {
+                    const seatId = `${row}${col}`, colorClass = getSeatClass(row, col), classNameText = getClassNameText(row, col);
+                    let seatInfo = bookedData[seatId], isBooked = false, displayName = classNameText;
+                    if (seatInfo) {
+                        if (typeof seatInfo === 'string' && seatInfo.trim() !== '') {
+                            isBooked = true; displayName = isDateString(seatInfo) ? classNameText : seatInfo;
+                        } else if (typeof seatInfo === 'object') {
+                            const nv = (seatInfo.name || '').trim(), cv = (seatInfo.class || '').trim();
+                            const nuv = (seatInfo.num || '').trim(), pv = (seatInfo.pass || '').trim(), cpv = (seatInfo.cancelpass || '').trim();
+                            if (nv || nuv || pv || cpv) { isBooked = true; displayName = (nv && !isDateString(nv)) ? `${nv} (${cv || classNameText})` : (cv || classNameText); }
+                        }
+                    }
+                    if (isBooked) bookedCount++;
+                    let isHighlighted = false;
+                    if (searchTerm) {
+                        const nm = typeof seatInfo === 'object' ? (seatInfo.name || '') : String(displayName);
+                        const pm = typeof seatInfo === 'object' ? (seatInfo.pass || '') : '';
+                        const num = typeof seatInfo === 'object' ? (seatInfo.num || '') : '';
+                        if (seatId.toLowerCase().includes(searchTerm) || classNameText.toLowerCase().includes(searchTerm) || nm.toLowerCase().includes(searchTerm) || pm.toLowerCase().includes(searchTerm) || num.toLowerCase().includes(searchTerm)) isHighlighted = true;
+                    }
+                    const el = document.createElement('div');
+                    el.className = `seat ${colorClass} ${isBooked ? 'booked' : ''} ${isHighlighted ? 'highlight' : ''}`;
+                    el.innerText = isBooked ? displayName : classNameText;
+                    el.title = isBooked ? `${seatId}: ${displayName}` : `${seatId} (${classNameText})`;
+                    if (!isBooked && currentMode === 'select') el.onclick = () => openModal(seatId, classNameText);
+                    else if (isBooked && currentMode === 'edit') el.onclick = () => promptCancelPassForSeat(seatId, seatInfo);
+                    grid.appendChild(el);
+                }
+            });
+            document.getElementById('statTotal').innerText = 180;
+            document.getElementById('statBooked').innerText = bookedCount;
+            document.getElementById('statAvailable').innerText = 180 - bookedCount;
+        }
+        function createHeaderCell(text) { const d = document.createElement('div'); d.className = 'grid-header'; d.innerText = text; return d; }
+        function handleSearch() { renderGrid(); }
+
+        function openModal(seatId, defaultClass) {
+            selectedSeat = { id: seatId, className: defaultClass };
+            document.getElementById('modalTitle').innerText = `จองที่นั่ง ${seatId}`;
+            document.getElementById('modalSubtitle').innerText = `โซนห้องเรียน: ${defaultClass}`;
+            ['studentNameInput', 'studentNoInput', 'studentPassInput', 'cancelPassInput'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('classNameInput').value = defaultClass || 'ม.1/3';
+            const o = document.getElementById('modalOverlay'); o.style.display = 'flex'; setTimeout(() => o.classList.add('active'), 10);
+            document.getElementById('studentNameInput').focus();
+        }
+        function closeModal() { const o = document.getElementById('modalOverlay'); o.classList.remove('active'); setTimeout(() => { o.style.display = 'none'; selectedSeat = null; }, 180); }
+
+        function confirmBooking() {
+            const name = document.getElementById('studentNameInput').value.trim();
+            const className = document.getElementById('classNameInput').value;
+            const no = document.getElementById('studentNoInput').value.trim();
+            const pass = document.getElementById('studentPassInput').value.trim();
+            const cancelPass = document.getElementById('cancelPassInput').value.trim();
+            if (!name) { showToast('กรุณากรอกชื่อ-นามสกุล', true); document.getElementById('studentNameInput').focus(); return; }
+            if (!no) { showToast('กรุณากรอกเลขที่', true); document.getElementById('studentNoInput').focus(); return; }
+            if (pass.length !== 7) { showToast('กรุณากรอกรหัสประจำตัวให้ครบ 7 หลัก', true); document.getElementById('studentPassInput').focus(); return; }
+            if (cancelPass.length !== 8) { showToast('กรุณากรอกรหัสยกเลิกให้ครบ 8 หลัก', true); document.getElementById('cancelPassInput').focus(); return; }
+            if (className !== selectedSeat.className) { showToast(`ห้องไม่ตรงกับเขตที่เลือก (โซน ${selectedSeat.className})`, true); return; }
+            const { id } = selectedSeat;
+            if (bookedData[id]) { showToast(`ที่นั่ง ${id} ถูกจองไปแล้ว!`, true); closeModal(); renderGrid(); return; }
+            const btn = document.querySelector('#modalOverlay .btn-primary');
+            if (btn) { btn.disabled = true; btn.innerHTML = ICON_SPIN + ' กำลังจอง...'; }
+            showToast(`กำลังบันทึกการจองที่นั่ง ${id}...`);
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reserve', seatId: id, studentName: name, className, studentNo: no, studentPass: pass, cancelPass }) })
+                .then(r => r.json()).then(data => {
+                    if (data.success) { bookedData[id] = { name, class: className, num: no, pass, cancelpass: cancelPass, time: new Date().toISOString() }; localStorage.setItem(STORAGE_KEY, JSON.stringify(bookedData)); showToast(`จองที่นั่ง ${id} สำเร็จ!`); closeModal(); renderGrid(); }
+                    else { showToast(data.message || 'เกิดข้อผิดพลาด', true); if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันการจอง'; } fetchAndSync(); }
+                }).catch(() => { showToast('ไม่สามารถเชื่อมต่อได้', true); if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันการจอง'; } });
+        }
+
+        function promptCancelPassForSeat(seatId, seatInfo) {
+            const pass = prompt(`กรอกรหัสยกเลิก 8 หลัก สำหรับที่นั่ง ${seatId}:`); if (!pass) return;
+            const stored = typeof seatInfo === 'object' ? (seatInfo.cancelpass || '').trim() : (seatInfo || '').trim();
+            if (pass.trim() === stored) {
+                activeEditBooking = { seatId, seatInfo, cancelPass: pass.trim() };
+                document.getElementById('editSeatIdBadge').innerText = seatId;
+                document.getElementById('editModalSub').innerText = `รหัสยกเลิกถูกต้อง • คุณสามารถยกเลิกการจองและคืนที่นั่งได้`;
+                const ov = document.getElementById('editModalOverlay'); ov.style.display = 'flex'; setTimeout(() => ov.classList.add('active'), 10);
+            } else showToast('รหัสยกเลิกไม่ถูกต้อง!', true);
+        }
+        function handleCancelPassLookup() {
+            const cp = document.getElementById('cancelPassLookupInput').value.trim();
+            if (cp.length !== 8) { showToast('กรุณากรอกรหัสยกเลิก 8 หลัก', true); return; }
+            let found = null;
+            for (const sid in bookedData) { const info = bookedData[sid]; const stored = typeof info === 'object' ? (info.cancelpass || '').trim() : (info || '').trim(); if (stored === cp) { found = { seatId: sid, seatInfo: info }; break; } }
+            if (found) promptCancelPassForSeat(found.seatId, found.seatInfo);
+            else showToast('ไม่พบรหัสยกเลิกนี้ในระบบ', true);
+        }
+        function closeEditModal() { const ov = document.getElementById('editModalOverlay'); ov.classList.remove('active'); setTimeout(() => { ov.style.display = 'none'; activeEditBooking = null; }, 180); }
+        function confirmCancelBooking() {
+            if (!activeEditBooking) return;
+            const { seatId, cancelPass } = activeEditBooking;
+            if (!confirm(`ต้องการยกเลิกการจองที่นั่ง ${seatId} ใช่หรือไม่?`)) return;
+            showToast('กำลังยกเลิกการจอง...');
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'cancel', seatId, cancelPass }) })
+                .then(r => r.json()).then(data => {
+                    if (data.success) { delete bookedData[seatId]; localStorage.setItem(STORAGE_KEY, JSON.stringify(bookedData)); showToast('ยกเลิกการจองสำเร็จ!'); closeEditModal(); renderGrid(); }
+                    else showToast(data.message || 'เกิดข้อผิดพลาด', true);
+                }).catch(() => showToast('ไม่สามารถเชื่อมต่อได้', true));
+        }
+        function fetchAndSync() {
+            fetch(SCRIPT_URL, { method: 'POST', cache: 'no-store', body: JSON.stringify({ action: 'get' }) })
+                .then(r => r.json()).then(data => { if (data && typeof data === 'object') { bookedData = data; localStorage.setItem(STORAGE_KEY, JSON.stringify(bookedData)); renderGrid(); } }).catch(() => { });
+        }
+        const LYRICS_IMGS = { morning: '../morning.jpg', evening: '../evening.jpg' };
+        let currentLyricsTab = 'morning';
+        function openLyrics() {
+            currentLyricsTab = 'morning';
+            document.getElementById('lyricsImg').src = LYRICS_IMGS.morning;
+            document.getElementById('lyricsImg').alt = 'เนื้อเพลงช่วงเช้า';
+            document.getElementById('tabMorning').classList.add('active');
+            document.getElementById('tabEvening').classList.remove('active');
+            const o = document.getElementById('lyricsOverlay');
+            o.style.display = 'flex'; setTimeout(() => o.classList.add('active'), 10);
+        }
+        function switchLyricsTab(tab) {
+            currentLyricsTab = tab;
+            const img = document.getElementById('lyricsImg');
+            img.src = LYRICS_IMGS[tab];
+            img.alt = tab === 'morning' ? 'เนื้อเพลงช่วงเช้า' : 'เนื้อเพลงช่วงเย็น';
+            document.getElementById('tabMorning').classList.toggle('active', tab === 'morning');
+            document.getElementById('tabEvening').classList.toggle('active', tab === 'evening');
+        }
+        function downloadLyrics() {
+            const a = document.createElement('a');
+            a.href = LYRICS_IMGS[currentLyricsTab];
+            a.download = currentLyricsTab === 'morning' ? 'เนื้อเพลงช่วงเช้า.jpg' : 'เนื้อเพลงช่วงเย็น.jpg';
+            a.click();
+        }
+        function closeLyricsBtn() { const o = document.getElementById('lyricsOverlay'); o.classList.remove('active'); setTimeout(() => { o.style.display = 'none'; }, 200); }
+        function closeLyrics(e) { if (e.target === document.getElementById('lyricsOverlay')) closeLyricsBtn(); }
+
+        window.onload = function () {
+            try { const s = localStorage.getItem(STORAGE_KEY); if (s) bookedData = JSON.parse(s); } catch (e) { }
+            const params = new URLSearchParams(window.location.search);
+            const mode = params.get('mode');
+            if (mode === 'view' || mode === 'edit' || mode === 'select') currentMode = mode;
+            renderGrid();
+            if (currentMode !== 'select') switchMode(currentMode);
+            fetchAndSync();
+            setInterval(fetchAndSync, 5000);
+            window.addEventListener('focus', fetchAndSync);
+        };
+    </script>
+</body>
+
+</html>
