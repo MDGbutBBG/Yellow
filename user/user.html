@@ -1417,7 +1417,7 @@
             if (row === 'H') return col <= 12 ? 'c-m1-9' : 'c-m2-9';
             if (row === 'G') return 'c-m2-9'; if (row === 'F') return 'c-m3-1';
             if (row === 'E') return col <= 12 ? 'c-m3-5' : 'c-m3-2'; if (row === 'D') return 'c-m3-2';
-            if (row === 'C') return col <= 5 ? 'c-m1-9' : 'c-m1-3';
+            if (row === 'C') return col === 5 ? 'c-m3-5' : (col < 5 ? 'c-m1-9' : 'c-m1-3');
             if (row === 'B') return col <= 15 ? 'c-m1-9' : 'c-m2-11'; if (row === 'A') return 'c-m2-11'; return '';
         }
         function getClassNameText(row, col) {
