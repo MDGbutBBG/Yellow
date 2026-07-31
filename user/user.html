@@ -1570,9 +1570,22 @@
                     else showToast(data.message || 'เกิดข้อผิดพลาด', true);
                 }).catch(() => showToast('ไม่สามารถเชื่อมต่อได้', true));
         }
-        function fetchAndSync() {
+        function fetchAndSync(retries = 3) {
             fetch(SCRIPT_URL, { method: 'POST', cache: 'no-store', body: JSON.stringify({ action: 'get' }) })
-                .then(r => r.json()).then(data => { if (data && typeof data === 'object') { bookedData = data; localStorage.setItem(STORAGE_KEY, JSON.stringify(bookedData)); renderGrid(); } }).catch(() => { });
+                .then(r => r.json())
+                .then(data => {
+                    if (data && typeof data === 'object' && !data.message) {
+                        // Server returned real booking data — replace local cache entirely
+                        bookedData = data;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookedData));
+                        renderGrid();
+                    }
+                })
+                .catch(() => {
+                    if (retries > 1) {
+                        setTimeout(() => fetchAndSync(retries - 1), 2000);
+                    }
+                });
         }
         const LYRICS_IMGS = { morning: '../morning.jpg', evening: '../evening.jpg' };
         let currentLyricsTab = 'morning';
@@ -1603,15 +1616,39 @@
         function closeLyrics(e) { if (e.target === document.getElementById('lyricsOverlay')) closeLyricsBtn(); }
 
         window.onload = function () {
-            try { const s = localStorage.getItem(STORAGE_KEY); if (s) bookedData = JSON.parse(s); } catch (e) { }
             const params = new URLSearchParams(window.location.search);
             const mode = params.get('mode');
             if (mode === 'view' || mode === 'edit' || mode === 'select') currentMode = mode;
-            renderGrid();
             if (currentMode !== 'select') switchMode(currentMode);
-            fetchAndSync();
-            setInterval(fetchAndSync, 5000);
-            window.addEventListener('focus', fetchAndSync);
+
+            // แสดง loading ก่อนเสมอ รอ server ก่อน render
+            const grid = document.getElementById('seatGrid');
+            if (grid) {
+                grid.innerHTML = '<div style="text-align:center;padding:40px;color:#888;font-size:0.95rem;">⏳ กำลังโหลดข้อมูลที่นั่ง...</div>';
+            }
+
+            // โหลดจาก server ก่อน ถ้าล้มเหลวค่อย fallback ไป localStorage
+            fetch(SCRIPT_URL, { method: 'POST', cache: 'no-store', body: JSON.stringify({ action: 'get' }) })
+                .then(r => r.json())
+                .then(data => {
+                    if (data && typeof data === 'object' && !data.message) {
+                        bookedData = data;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookedData));
+                    } else {
+                        // server ตอบกลับแต่ข้อมูลผิดรูปแบบ — ใช้ cache
+                        try { const s = localStorage.getItem(STORAGE_KEY); if (s) bookedData = JSON.parse(s); } catch (e) {}
+                    }
+                    renderGrid();
+                })
+                .catch(() => {
+                    // network error — fallback ไป localStorage แล้ว retry ใน 3 วิ
+                    try { const s = localStorage.getItem(STORAGE_KEY); if (s) bookedData = JSON.parse(s); } catch (e) {}
+                    renderGrid();
+                    setTimeout(() => fetchAndSync(3), 3000);
+                });
+
+            setInterval(fetchAndSync, 30000);
+            window.addEventListener('focus', () => fetchAndSync(2));
         };
     </script>
 </body>
