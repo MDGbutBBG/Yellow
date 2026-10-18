@@ -4,6 +4,9 @@
 function doGet(e) {
     // Handle GET requests (e.g. browser redirects or preflight)
     const action = e && e.parameter && e.parameter.action ? e.parameter.action : '';
+    if (action === 'directory') {
+        return responseJSON(getSeatDirectory());
+    }
     if (action === 'get') {
         return responseJSON(getBookings());
     }
@@ -15,23 +18,14 @@ function doPost(e) {
         const data = JSON.parse(e.postData.contents);
         const action = data.action;
 
+        if (action === 'directory') {
+            return responseJSON(getSeatDirectory());
+        }
         if (action === 'get') {
             return responseJSON(getBookings());
         }
-        else if (action === 'reserve') {
-            const result = reserveSeat(
-                data.seatId,
-                data.studentName,
-                data.className,
-                data.studentNo,
-                data.studentPass,
-                data.cancelPass
-            );
-            return responseJSON(result);
-        }
-        else if (action === 'cancel') {
-            const result = cancelSeat(data.seatId, data.cancelPass);
-            return responseJSON(result);
+        else if (action === 'reserve' || action === 'cancel') {
+            return responseJSON({ success: false, message: 'เว็บไซต์อยู่ในโหมดดูผัง ไม่เปิดรับการจองหรือยกเลิกที่นั่ง' });
         }
         else if (action === 'admin_clear') {
             const result = adminClearSeat(data.adminPass, data.seatId);
@@ -108,6 +102,30 @@ function getBookings() {
         }
     }
     return bookings;
+}
+
+// Public endpoint for the student seat map. It intentionally returns only
+// information shown on the card. Read the sheet on every request so edits
+// made directly in the spreadsheet are reflected immediately.
+function getSeatDirectory() {
+    const sheet = getSheet();
+    const lastRow = sheet.getLastRow();
+    const directory = {};
+    if (lastRow < 2) return directory;
+
+    // Read only the four public columns and preserve values exactly as shown.
+    const data = sheet.getRange(2, 1, lastRow - 1, 4).getDisplayValues();
+    for (let i = 0; i < data.length; i++) {
+        const seatId = (data[i][0] || '').trim();
+        const name = (data[i][1] || '').trim();
+        const className = (data[i][2] || '').trim();
+        const studentNo = (data[i][3] || '').trim();
+        if (seatId && (name || className || studentNo)) {
+            directory[seatId] = { name: name, class: className, num: studentNo };
+        }
+    }
+
+    return directory;
 }
 
 function reserveSeat(seatId, studentName, className, studentNo, studentPass, cancelPass) {

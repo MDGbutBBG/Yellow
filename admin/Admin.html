@@ -250,6 +250,56 @@
         .lyrics-download-btn { width:100%; padding:11px 16px; border:none; border-radius:14px; background:linear-gradient(135deg,#3D2B00,#6B4A00); color:#FFD700; font-size:.92rem; font-weight:700; cursor:pointer; font-family:'Prompt',sans-serif; display:flex; align-items:center; justify-content:center; gap:9px; transition:all .2s cubic-bezier(.34,1.56,.64,1); box-shadow:0 4px 14px rgba(60,40,0,.25); }
         .lyrics-download-btn svg { width:16px; height:16px; }
         .lyrics-download-btn:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(60,40,0,.35); }
+        /* Product refresh: a focused operations screen, without ornamental noise */
+        :root { --paper:#fffdf8; --canvas:#f3f0e8; --ink:#25231f; --muted:#6f6a60; --line:#ded8cc; --sun:#e2ad3d; --sun-deep:#b97820; --night:#27434a; }
+        body { background:var(--canvas); padding:clamp(18px,3vw,38px) 16px 56px; color:var(--ink); }
+        .blob { display:none; }
+        .app-container { max-width:1240px; gap:16px; }
+        .admin-header { background:var(--night); border:0; border-radius:12px; box-shadow:0 10px 26px rgba(39,67,74,.16); padding:24px 26px; }
+        .admin-header::after { display:none; }
+        .admin-title-group h1 { color:#fff; font-size:1.5rem; }
+        .admin-title-group h1 svg { color:var(--sun); }
+        .admin-title-group p { color:#c7d2cf; }
+        .btn-home { background:transparent; border:1px solid rgba(255,255,255,.35); color:#fff; border-radius:7px; }
+        .btn-home:hover { background:rgba(255,255,255,.12); color:#fff; transform:none; }
+        .btn-logout { background:#c95f45; border-radius:7px; box-shadow:none; }
+        .btn-logout:hover { background:#b74e37; box-shadow:none; transform:none; }
+        .stat-card, .toolbar-card, .table-card { background:var(--paper); border:1px solid var(--line); border-radius:12px; box-shadow:0 8px 26px rgba(48,43,34,.05); }
+        .stat-card { padding:18px; }
+        .stat-card::after { display:none; }
+        .stat-card:hover { transform:none; box-shadow:0 8px 26px rgba(48,43,34,.08); }
+        .stat-card .label { color:var(--muted); }
+        .stat-card .value { color:var(--night); }
+        .toolbar-card { padding:14px 18px; }
+        .search-box input { background:#fff; border:1px solid #cfc8bd; border-radius:7px; color:var(--ink); min-height:42px; }
+        .search-box input:focus { border-color:var(--sun-deep); box-shadow:0 0 0 3px rgba(226,173,61,.2); background:#fff; }
+        .search-box .icon { color:var(--muted); }
+        .btn-action { border-radius:7px; box-shadow:none; }
+        .btn-export { background:var(--night); }
+        .btn-export:hover { background:#1d353b; box-shadow:none; transform:none; }
+        .btn-reset-all { background:#fff4f1; border:1px solid #efc7bd; }
+        .btn-reset-all:hover { background:#fee9e4; transform:none; }
+        .table-card { padding:16px; }
+        th { background:#f5f1e7; border-bottom:1px solid #e2dacb; color:#5f594e; }
+        th:first-child { border-radius:6px 0 0 0; } th:last-child { border-radius:0 6px 0 0; }
+        td { border-bottom-color:#ebe5da; color:var(--ink); }
+        tr:hover td { background:#faf7ef; }
+        .badge-seat { background:#f6e8bf; border-radius:5px; box-shadow:none; color:#6c4815; }
+        .badge-code { background:#f7f4ed; border-color:#e0d8c9; border-radius:5px; color:#5f594e; }
+        .btn-tbl-del { border-radius:6px; }
+        .auth-overlay { background:rgba(37,35,31,.46); backdrop-filter:blur(3px); }
+        .auth-card { background:var(--paper); border:1px solid var(--line); border-radius:12px; box-shadow:0 24px 60px rgba(37,35,31,.18); }
+        .auth-lock { background:#f6e8bf; border-radius:9px; box-shadow:none; animation:none; }
+        .auth-card h2 { color:var(--ink); }
+        .auth-card p, .auth-back a { color:var(--muted); }
+        .auth-card input { background:#fff; border-color:#cfc8bd; border-radius:7px; color:var(--ink); }
+        .auth-card input:focus { border-color:var(--sun-deep); box-shadow:0 0 0 3px rgba(226,173,61,.2); }
+        .btn-auth { background:var(--night); border-radius:7px; box-shadow:none; color:#fff; }
+        .btn-auth:hover { background:#1d353b; box-shadow:none; transform:none; }
+        .lyrics-fab { background:var(--night); border-radius:8px; box-shadow:0 6px 18px rgba(39,67,74,.22); color:#fff; width:48px; height:48px; bottom:22px; right:22px; }
+        .lyrics-fab:hover { background:#1d353b; box-shadow:none; transform:translateY(-2px); }
+        @media(max-width:600px) { .admin-header { padding:20px; } .header-actions { width:100%; } .btn-nav { flex:1; justify-content:center; } .search-box { max-width:none; min-width:100%; } .action-btns { width:100%; } .btn-action { flex:1; justify-content:center; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
     </style>
 </head>
 <body>
@@ -547,7 +597,23 @@
         showToast('ส่งออกไฟล์ CSV เรียบร้อยแล้ว!');
     }
 
-    function openLyrics(){const o=document.getElementById('lyricsOverlay');o.style.display='flex';setTimeout(()=>o.classList.add('active'),10);}
+    const LYRICS_IMGS = { morning: '../morning.jpg', evening: '../evening.jpg' };
+    let currentLyricsTab = 'morning';
+    function switchLyricsTab(tab){
+        currentLyricsTab=tab;
+        const img=document.getElementById('lyricsImg');
+        img.src=LYRICS_IMGS[tab];
+        img.alt=tab==='morning'?'เนื้อเพลงช่วงเช้า':'เนื้อเพลงช่วงเย็น';
+        document.getElementById('tabMorning').classList.toggle('active',tab==='morning');
+        document.getElementById('tabEvening').classList.toggle('active',tab==='evening');
+    }
+    function downloadLyrics(){
+        const a=document.createElement('a');
+        a.href=LYRICS_IMGS[currentLyricsTab];
+        a.download=currentLyricsTab==='morning'?'เนื้อเพลงช่วงเช้า.jpg':'เนื้อเพลงช่วงเย็น.jpg';
+        a.click();
+    }
+    function openLyrics(){currentLyricsTab='morning';document.getElementById('lyricsImg').src=LYRICS_IMGS.morning;document.getElementById('lyricsImg').alt='เนื้อเพลงช่วงเช้า';document.getElementById('tabMorning').classList.add('active');document.getElementById('tabEvening').classList.remove('active');const o=document.getElementById('lyricsOverlay');o.style.display='flex';setTimeout(()=>o.classList.add('active'),10);}
     function closeLyricsBtn(){const o=document.getElementById('lyricsOverlay');o.classList.remove('active');setTimeout(()=>{o.style.display='none';},200);}
     function closeLyrics(e){if(e.target===document.getElementById('lyricsOverlay'))closeLyricsBtn();}
 
