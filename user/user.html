@@ -1523,8 +1523,8 @@
                 for (let col = 1; col <= 20; col++) {
                     const seatId = `${row}${col}`;
                     const seatInfo = seatData[seatId];
-                    const details = getSeatDetails(seatInfo, '');
-                    assignedCount++;
+                    const details = getSeatDetails(seatInfo, getClassNameText(row, col));
+                    if (details.name || details.number) assignedCount++;
                     const isHighlighted = searchTerm && [seatId, details.name, details.number, details.room].some(value => value.toLowerCase().includes(searchTerm));
                     const el = document.createElement('div');
                     el.className = `seat ${getRoomColorClass(details.room, getSeatClass(row, col))} ${isHighlighted ? 'highlight' : ''}`;
@@ -1578,13 +1578,8 @@
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape' && document.getElementById('seatCardOverlay').classList.contains('active')) closeSeatCard();
         });
-        function isCompleteDirectory(data) {
-            if (!data || typeof data !== 'object') return false;
-            const expectedIds = rows.flatMap(row => Array.from({ length: 20 }, (_, index) => `${row}${index + 1}`));
-            return expectedIds.every(seatId => {
-                const record = data[seatId];
-                return record && String(record.name || '').trim() && String(record.class || '').trim() && String(record.num || '').trim();
-            });
+        function isUsableDirectory(data) {
+            return Boolean(data && typeof data === 'object' && !Array.isArray(data) && !data.message && !('success' in data));
         }
         function toPublicDirectory(data) {
             const result = {};
@@ -1598,13 +1593,13 @@
         function getCachedDirectory() {
             try {
                 const cached = JSON.parse(localStorage.getItem(DIRECTORY_CACHE_KEY) || 'null');
-                return isCompleteDirectory(cached) ? cached : null;
+                return isUsableDirectory(cached) ? cached : null;
             } catch (error) {
                 return null;
             }
         }
         function saveCachedDirectory(data) {
-            localStorage.setItem(DIRECTORY_CACHE_KEY, JSON.stringify(data));
+            try { localStorage.setItem(DIRECTORY_CACHE_KEY, JSON.stringify(data)); } catch (error) {}
         }
         function getDirectoryMode() {
             try {
@@ -1614,28 +1609,31 @@
             }
         }
         function saveDirectoryMode(mode) {
-            localStorage.setItem(DIRECTORY_MODE_KEY, JSON.stringify({ mode, checkedAt: Date.now() }));
+            try { localStorage.setItem(DIRECTORY_MODE_KEY, JSON.stringify({ mode, checkedAt: Date.now() })); } catch (error) {}
         }
-        function postDirectoryAction(action) {
-            return fetch(SCRIPT_URL, {
-                method: 'POST',
-                cache: 'no-store',
-                body: JSON.stringify({ action })
-            }).then(response => response.json());
+        function getDirectoryAction(action) {
+            const url = new URL(SCRIPT_URL);
+            url.searchParams.set('action', action);
+            url.searchParams.set('_', Date.now().toString());
+            return fetch(url.toString(), { cache: 'no-store' })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.json();
+                });
         }
         function requestDirectory() {
             const knownMode = getDirectoryMode();
             const shouldUseLegacy = knownMode && knownMode.mode === 'legacy' && Date.now() - knownMode.checkedAt < 300000;
-            if (shouldUseLegacy) return postDirectoryAction('get');
+            if (shouldUseLegacy) return getDirectoryAction('get');
 
-            return postDirectoryAction('directory').then(data => {
-                if (isCompleteDirectory(data)) {
+            return getDirectoryAction('directory').then(data => {
+                if (isUsableDirectory(data)) {
                     saveDirectoryMode('directory');
                     return data;
                 }
                 // Existing deployments may not contain the public endpoint yet.
                 // Remember that capability so later refreshes make only one request.
-                return postDirectoryAction('get').then(legacyData => {
+                return getDirectoryAction('get').then(legacyData => {
                     saveDirectoryMode('legacy');
                     return legacyData;
                 });
@@ -1644,12 +1642,11 @@
         function showDirectoryLoading() {
             document.getElementById('seatGrid').innerHTML = '<div style="text-align:center;padding:40px;color:#6f6a60;font-size:.95rem;">กำลังดึงข้อมูลผังที่นั่ง...</div>';
         }
-        function showDirectoryError() {
-            document.getElementById('seatGrid').innerHTML = '<div style="text-align:center;padding:40px;color:#6f6a60;font-size:.95rem;">ยังดึงข้อมูลผังที่นั่งไม่สำเร็จ<br><button type="button" onclick="retrySeatDirectory()" style="margin-top:12px;padding:8px 12px;border:1px solid #cfc8bd;border-radius:7px;background:#fff;cursor:pointer;font:inherit;">ลองใหม่</button></div>';
-        }
-        function retrySeatDirectory() {
-            showDirectoryLoading();
-            loadSeatData();
+        function setDirectoryStatus(text, color) {
+            const status = document.getElementById('statStatus');
+            if (!status) return;
+            status.textContent = text;
+            status.style.color = color;
         }
         function loadSeatData() {
             if (directoryRequestInFlight) return Promise.resolve();
@@ -1657,14 +1654,18 @@
             return requestDirectory()
                 .then(data => {
                     const publicDirectory = toPublicDirectory(data);
-                    if (!isCompleteDirectory(publicDirectory)) throw new Error('Incomplete seat directory');
+                    if (!isUsableDirectory(data)) throw new Error('Invalid seat directory');
                     seatData = publicDirectory;
                     directoryReady = true;
                     saveCachedDirectory(seatData);
                     renderGrid();
+                    setDirectoryStatus('อัปเดตแล้ว', '#2E7D32');
                 })
                 .catch(() => {
-                    if (!directoryReady) showDirectoryError();
+                    // Keep the visible map usable when a device cannot reach Apps Script.
+                    // The next scheduled refresh will try again without interrupting the user.
+                    renderGrid();
+                    setDirectoryStatus(directoryReady ? 'กำลังแสดงข้อมูลล่าสุด' : 'แสดงผังออฟไลน์', '#8A6500');
                 })
                 .finally(() => { directoryRequestInFlight = false; });
         }
@@ -1676,11 +1677,9 @@
                 seatData = cachedDirectory;
                 directoryReady = true;
                 renderGrid();
-            } else {
-                showDirectoryLoading();
-            }
+            } else renderGrid();
             loadSeatData();
-            setInterval(loadSeatData, 3000);
+            setInterval(loadSeatData, 30000);
             window.addEventListener('focus', loadSeatData);
         }
 
